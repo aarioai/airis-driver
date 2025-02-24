@@ -27,24 +27,24 @@ func ToMongoDBIndexModels(t Entity) []mongo.IndexModel {
 		keys := make(bson.D, 0, len(columns))
 		for _, col := range columns {
 			switch col.Type {
-			case TextT:
-				keys = append(keys, bson.E{Key: col.Column, Value: "text"})
+			case FullTextT:
+				keys = append(keys, bson.E{Key: col.Field, Value: "text"})
 				if col.Language != "" {
 					keys = append(keys, bson.E{Key: "default_language", Value: col.Language})
 				}
 			case HashedT:
-				keys = append(keys, bson.E{Key: col.Column, Value: "hashed"})
+				keys = append(keys, bson.E{Key: col.Field, Value: "hashed"})
 			case Spatial2DT:
-				keys = append(keys, bson.E{Key: col.Column, Value: "2d"})
+				keys = append(keys, bson.E{Key: col.Field, Value: "2d"})
 			case Spatial2DSphereT:
-				keys = append(keys, bson.E{Key: col.Column, Value: "2dsphere"})
+				keys = append(keys, bson.E{Key: col.Field, Value: "2dsphere"})
 
 			default:
 				value := -1
 				if col.Asc {
 					value = 1
 				}
-				keys = append(keys, bson.E{Key: col.Column, Value: value})
+				keys = append(keys, bson.E{Key: col.Field, Value: value})
 			}
 		}
 		indexModel := mongo.IndexModel{Keys: keys, Options: opt}

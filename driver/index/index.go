@@ -1,10 +1,13 @@
 package index
 
-import "slices"
+import (
+	"slices"
+	"strings"
+)
 
 type IndexType uint8
 type IndexColumn struct {
-	Column    string
+	Field     string
 	Asc       bool // default is DESC
 	Invisible bool
 	Type      IndexType
@@ -17,10 +20,14 @@ type Entity interface {
 }
 
 const (
+	PrimaryIndexName = "PRIMARY"
+)
+
+const (
 	PrimaryT IndexType = iota
 	UniqueT
 	IndexT
-	TextT // MySQL FullText, Mongodb Text
+	FullTextT // MySQL fulltext, Mongodb text
 	SpatialT
 
 	Spatial2DT
@@ -30,13 +37,47 @@ const (
 
 func index(t IndexType, fields ...string) []IndexColumn {
 	if len(fields) == 1 {
-		return []IndexColumn{{Type: t, Column: fields[0]}}
+		return []IndexColumn{{Type: t, Field: fields[0]}}
 	}
 	indexes := make([]IndexColumn, 0, len(fields))
 	for _, field := range fields {
-		indexes = append(indexes, IndexColumn{Type: t, Column: field})
+		indexes = append(indexes, IndexColumn{Type: t, Field: field})
 	}
 	return indexes
+}
+func parseFieldNames(columns []IndexColumn) []string {
+	fields := make([]string, len(columns))
+	for i, column := range columns {
+		fields[i] = column.Field
+	}
+	return fields
+}
+func makeIndexName(t IndexType, columns []IndexColumn) string {
+	var s strings.Builder
+	switch t {
+	case PrimaryT:
+		return PrimaryIndexName
+	case UniqueT:
+		s.WriteString("u")
+	case IndexT:
+		s.WriteString("i")
+	case FullTextT:
+		s.WriteString("t")
+	case SpatialT:
+		s.WriteString("s")
+	case Spatial2DT:
+		s.WriteString("d")
+	case Spatial2DSphereT:
+		s.WriteString("p")
+	case HashedT:
+		s.WriteString("h")
+	}
+	for _, column := range columns {
+		field := strings.ReplaceAll(column.Field, "_", "")
+		s.WriteByte('_')
+		s.WriteString(field)
+	}
+	return s.String()
 }
 func Primary(fields ...string) []IndexColumn {
 	return index(PrimaryT, fields...)
@@ -48,7 +89,7 @@ func Index(fields ...string) []IndexColumn {
 	return index(IndexT, fields...)
 }
 func FullText(fields ...string) []IndexColumn {
-	return index(TextT, fields...)
+	return index(FullTextT, fields...)
 }
 func Spatial(fields ...string) []IndexColumn {
 	return index(SpatialT, fields...)
@@ -63,18 +104,25 @@ func Hashed(fields ...string) []IndexColumn {
 	return index(HashedT, fields...)
 }
 
-func (s Indexes) Primary() []string {
-	for _, columns := range s {
+func NewIndexes(indexes ...[]IndexColumn) Indexes {
+	idx := make(Indexes, len(indexes))
+	for _, columns := range indexes {
 		if len(columns) == 0 {
 			continue
 		}
-		if columns[0].Type == PrimaryT {
-			fields := make([]string, len(columns))
-			for i, column := range columns {
-				fields[i] = column.Column
-			}
-			return fields
-		}
+		idxName := makeIndexName(columns[0].Type, columns)
+		idx[idxName] = columns
+	}
+	return idx
+}
+
+func (s Indexes) Primary(indexName ...string) []string {
+	name := PrimaryIndexName
+	if len(indexName) > 0 {
+		name = indexName[0]
+	}
+	if columns, ok := s[name]; ok {
+		return parseFieldNames(columns)
 	}
 	return nil
 }
@@ -88,11 +136,7 @@ func (s Indexes) List(types ...IndexType) map[string][]string {
 			continue
 		}
 		if slices.Contains(types, columns[0].Type) {
-			fields := make([]string, len(columns))
-			for i, column := range columns {
-				fields[i] = column.Column
-			}
-			indexes[name] = fields
+			indexes[name] = parseFieldNames(columns)
 		}
 	}
 	if len(indexes) == 0 {
