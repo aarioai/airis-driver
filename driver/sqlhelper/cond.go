@@ -9,8 +9,8 @@ import (
 type Cond struct {
 	Constraint strings.Builder
 	orderby    string
-	offset     uint
-	limit      uint
+	offset     int
+	limit      int
 }
 
 func NewCond(paging atype.Paging) *Cond {
@@ -56,13 +56,13 @@ func (c *Cond) OrderBy(keyword string) *Cond {
 	return c
 }
 
-func (c *Cond) Limit(offset, limit uint) *Cond {
+func (c *Cond) Limit(offset, limit int) *Cond {
 	c.offset = offset
 	c.limit = limit
 	return c
 }
 
-func (c *Cond) Try(orderBy string, offset, limit uint) *Cond {
+func (c *Cond) Try(orderBy string, offset, limit int) *Cond {
 	if c.orderby == "" {
 		c.orderby = orderBy
 	}
@@ -73,7 +73,7 @@ func (c *Cond) Try(orderBy string, offset, limit uint) *Cond {
 	return c
 }
 
-func (c *Cond) LimitN() uint {
+func (c *Cond) LimitN() int {
 	if c.limit > 0 {
 		return c.limit
 	}
@@ -82,8 +82,8 @@ func (c *Cond) LimitN() uint {
 
 func (c *Cond) LimitStmt() string {
 	limit := c.LimitN()
-	a := types.FormatUint(c.offset)
-	b := types.FormatUint(limit)
+	a := types.FormatInt(c.offset)
+	b := types.FormatInt(limit)
 	return "LIMIT " + a + "," + b
 }
 

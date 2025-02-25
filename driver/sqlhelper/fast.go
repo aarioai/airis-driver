@@ -29,6 +29,7 @@ func In(field string, ids map[uint64]struct{}) string {
 	s.WriteByte(')')
 	return s.String()
 }
+
 func InUint(field string, ids map[uint]struct{}) string {
 	if len(ids) == 0 {
 		return "1!=1"
@@ -53,6 +54,7 @@ func InUint(field string, ids map[uint]struct{}) string {
 	s.WriteByte(')')
 	return s.String()
 }
+
 func InValues(field string, ids map[string]struct{}) string {
 	if len(ids) == 0 {
 		return "1!=1"
