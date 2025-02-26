@@ -2,6 +2,7 @@ package driver
 
 import (
 	"github.com/aarioai/airis/core"
+	"github.com/aarioai/airis/pkg/afmt"
 	"strings"
 	"time"
 )
@@ -50,19 +51,22 @@ func ParseTimeouts(t string, defaultTimeouts ...time.Duration) (conn time.Durati
 	return
 }
 
-func tryGetSectionCfg(app *core.App, base, section string, key string) (string, error) {
+func tryGetSectionCfg(app *core.App, base, section string, key string, defaultValue ...string) (string, error) {
 	k := section + "." + key
 	v, err := app.Config.MustGetString(k)
-	if err == nil {
-		return v, nil
-	}
-	if section != base {
-		if !strings.HasPrefix(section, base+"_") {
-			// 尝试section加 mysql_/redis_/mongodb_... 开头
-			return tryGetSectionCfg(app, base, base+"_"+section, key)
+	defaultV := afmt.First(defaultValue)
+	if err != nil {
+		if section != base {
+			if !strings.HasPrefix(section, base+"_") {
+				// 尝试section加 mysql_/redis_/mongodb_... 开头
+				return tryGetSectionCfg(app, base, base+"_"+section, key)
+			}
+			// 读取默认值，即 mysql.$key/redis.$key/mongodb.$key...
+			v, err = app.Config.MustGetString(base + "." + key)
 		}
-		// 读取默认值，即 mysql.$key/redis.$key/mongodb.$key...
-		return app.Config.MustGetString(base + "." + key)
 	}
-	return "", err
+	if v == "" {
+		v = defaultV
+	}
+	return v, err
 }
