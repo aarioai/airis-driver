@@ -49,11 +49,11 @@ func (t *Tx) Commit() *ae.Error {
 func (t *Tx) Recover() func() {
 	return func() {
 		if p := recover(); p != nil {
-			alog.PrintError(t.Tx.Rollback())
+			alog.LogOnError(t.Tx.Rollback())
 		}
 		if t.result == 0 {
 			log.Println("[waring] tx not commit")
-			alog.PrintError(t.Tx.Commit())
+			alog.LogOnError(t.Tx.Commit())
 		}
 	}
 }
@@ -62,7 +62,7 @@ func (t *Tx) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 	stmt, err := t.Tx.PrepareContext(ctx, query)
 	if err != nil {
 		if stmt != nil {
-			alog.PrintError(stmt.Close())
+			alog.LogOnError(stmt.Close())
 		}
 		return nil, driver.NewSQLError(err, query)
 	}
@@ -102,7 +102,7 @@ func (t *Tx) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 // 批量查询
 /*
 	stmt,_ := db.Prepare("select count(*) from tb where id=?")
-	defer stmt.Shutdown()
+	defer stmt.Close()
 	for i:=0;i<1000;i++{
 		stmt.QueryRowContext(ctx, i).&Scan()
 	}
@@ -162,7 +162,7 @@ func (t *Tx) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 	rows, err := t.Tx.QueryContext(ctx, query, args...)
 	if err != nil {
 		if rows != nil {
-			alog.PrintError(rows.Close())
+			alog.LogOnError(rows.Close())
 		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ae.ErrorNoRows

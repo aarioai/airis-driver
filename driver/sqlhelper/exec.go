@@ -41,12 +41,12 @@ func (d *DB) Close() {
 			https://pkg.go.dev/database/sql#Open
 			The returned DB is safe for concurrent use by multiple goroutines and maintains its own pool of idle connections. Thus, the Open function should be called just once. It is rarely necessary to close a DB.
 		*/
-		alog.PrintError(d.DB.Close())
+		alog.LogOnError(d.DB.Close())
 	}
 }
 
 // 批处理 prepare 性能会更好，但需要支持 mysqli；非批处理，不要使用 prepare，会造成多余开销
-// 不要忘记 stmt.Shutdown() 释放连接池资源
+// 不要忘记 stmt.Close() 释放连接池资源
 // Prepared statements take up server resources and should be closed after use.
 func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 	if d.err != nil {
@@ -55,7 +55,7 @@ func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 	stmt, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		if stmt != nil {
-			alog.PrintError(stmt.Close())
+			alog.LogOnError(stmt.Close())
 		}
 		return nil, driver.NewSQLError(err, query)
 	}
@@ -109,7 +109,7 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 // 批量查询
 /*
 	stmt,_ := db.Prepare("select count(*) from tb where id=?")
-	defer stmt.Shutdown()
+	defer stmt.Close()
 	for i:=0;i<1000;i++{
 		stmt.QueryRowContext(ctx, i).&Scan()
 	}
@@ -119,7 +119,7 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 //	if e != nil {
 //		return nil, e
 //	}
-//	defer stmt.Shutdown()
+//	defer stmt.Close()
 //	rows := make([]*sql.Row, len(margs))
 //	for i, args := range margs {
 //		rows[i] = stmt.QueryRowContext(ctx, args...)
@@ -187,7 +187,7 @@ func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 	rows, err := d.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		if rows != nil {
-			alog.PrintError(rows.Close())
+			alog.LogOnError(rows.Close())
 		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ae.ErrorNoRows
