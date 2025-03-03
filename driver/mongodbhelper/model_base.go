@@ -22,6 +22,7 @@ func CreateIndexes(ctx context.Context, db *mongo.Database, t index.Entity) *ae.
 	_, err := coll.Indexes().CreateMany(ctx, models)
 	return driver.NewMongodbError(err)
 }
+
 func AggregateRaw(ctx context.Context, db *mongo.Database, t EntityInterface, pipeline interface{}, opts ...options.Lister[options.AggregateOptions]) (*mongo.Cursor, *ae.Error) {
 	coll := db.Collection(t.Table())
 	cursor, err := coll.Aggregate(ctx, pipeline, opts...)
@@ -30,6 +31,7 @@ func AggregateRaw(ctx context.Context, db *mongo.Database, t EntityInterface, pi
 	}
 	return cursor, nil
 }
+
 func Aggregate(ctx context.Context, results interface{}, db *mongo.Database, t EntityInterface, pipeline interface{}, opts ...options.Lister[options.AggregateOptions]) *ae.Error {
 	cursor, e := AggregateRaw(ctx, db, t, pipeline, opts...)
 	if e != nil {
@@ -57,6 +59,7 @@ func DeleteOne(ctx context.Context, db *mongo.Database, t EntityInterface, filte
 	}
 	return result, nil
 }
+
 func DeleteMany(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.DeleteManyOptions]) (*mongo.DeleteResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	result, err := coll.DeleteMany(ctx, filter, opts...)
@@ -65,15 +68,18 @@ func DeleteMany(ctx context.Context, db *mongo.Database, t EntityInterface, filt
 	}
 	return result, nil
 }
+
 func Distinct(ctx context.Context, db *mongo.Database, t EntityInterface, field string, filter interface{}, opts ...options.Lister[options.DistinctOptions]) (*mongo.DistinctResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	return coll.Distinct(ctx, field, filter, opts...), nil
 }
+
 func Drop(ctx context.Context, db *mongo.Database, t EntityInterface, opts ...options.Lister[options.DropCollectionOptions]) *ae.Error {
 	coll := db.Collection(t.Table())
 	err := coll.Drop(ctx, opts...)
 	return driver.NewMongodbError(err)
 }
+
 func EstimatedDocumentCount(ctx context.Context, db *mongo.Database, t EntityInterface, opts ...options.Lister[options.EstimatedDocumentCountOptions]) (int64, *ae.Error) {
 	coll := db.Collection(t.Table())
 	result, err := coll.EstimatedDocumentCount(ctx, opts...)
@@ -82,10 +88,12 @@ func EstimatedDocumentCount(ctx context.Context, db *mongo.Database, t EntityInt
 	}
 	return result, nil
 }
+
 func FindOneRaw(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOneOptions]) (*mongo.SingleResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	return coll.FindOne(ctx, filter, opts...), nil
 }
+
 func FindOne(ctx context.Context, result interface{}, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
 	r, e := FindOneRaw(ctx, db, t, filter, opts...)
 	if e != nil {
@@ -97,6 +105,7 @@ func FindOne(ctx context.Context, result interface{}, db *mongo.Database, t Enti
 	}
 	return nil
 }
+
 func FindRaw(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
 	coll := db.Collection(t.Table())
 	cursor, err := coll.Find(ctx, filter, opts...)
@@ -109,6 +118,7 @@ func FindRaw(ctx context.Context, db *mongo.Database, t EntityInterface, filter 
 	}
 	return cursor, nil
 }
+
 func Find(ctx context.Context, results interface{}, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOptions]) *ae.Error {
 	cursor, e := FindRaw(ctx, db, t, filter, opts...)
 	if e != nil {
@@ -122,6 +132,7 @@ func Find(ctx context.Context, results interface{}, db *mongo.Database, t Entity
 	}
 	return e
 }
+
 func FindOneAndDelete(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOneAndDeleteOptions]) (*mongo.SingleResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	return coll.FindOneAndDelete(ctx, filter, opts...), nil
@@ -131,6 +142,7 @@ func FindOneAndReplace(ctx context.Context, db *mongo.Database, t EntityInterfac
 	coll := db.Collection(t.Table())
 	return coll.FindOneAndReplace(ctx, filter, replace, opts...), nil
 }
+
 func FindOneAndUpdate(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.FindOneAndUpdateOptions]) (*mongo.SingleResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	return coll.FindOneAndUpdate(ctx, filter, update, opts...), nil
@@ -144,15 +156,16 @@ func InsertOne(ctx context.Context, db *mongo.Database, t EntityInterface) (*mon
 	}
 	return result, nil
 }
+
 func ReplaceOne(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	result, err := coll.ReplaceOne(ctx, filter, t, opts...)
-
 	if err != nil {
 		return nil, driver.NewMongodbError(err)
 	}
 	return result, nil
 }
+
 func UpdateOne(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	result, err := coll.UpdateOne(ctx, filter, update, opts...)
@@ -161,9 +174,11 @@ func UpdateOne(ctx context.Context, db *mongo.Database, t EntityInterface, filte
 	}
 	return result, nil
 }
+
 func UpdateByObjectID(ctx context.Context, db *mongo.Database, t EntityInterface, id string, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	return UpdateOne(ctx, db, t, bson.D{{"_id", id}}, update, opts...)
 }
+
 func UpdateMany(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	coll := db.Collection(t.Table())
 	result, err := coll.UpdateMany(ctx, filter, update, opts...)
@@ -172,6 +187,7 @@ func UpdateMany(ctx context.Context, db *mongo.Database, t EntityInterface, filt
 	}
 	return result, nil
 }
+
 func UpsertOne(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if len(opts) == 0 {
 		opts = make([]options.Lister[options.UpdateOneOptions], 0, 1)
@@ -179,6 +195,7 @@ func UpsertOne(ctx context.Context, db *mongo.Database, t EntityInterface, filte
 	opts = append(opts, options.UpdateOne().SetUpsert(true))
 	return UpdateOne(ctx, db, t, filter, update, opts...)
 }
+
 func UpsertMany(ctx context.Context, db *mongo.Database, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if len(opts) == 0 {
 		opts = make([]options.Lister[options.UpdateManyOptions], 0, 1)

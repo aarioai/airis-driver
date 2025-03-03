@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"github.com/aarioai/airis/core"
+	"github.com/aarioai/airis/core/alog"
 	"github.com/aarioai/airis/pkg/afmt"
 	"strings"
 	"sync"
@@ -78,24 +79,28 @@ func CloseAllPools(ctx context.Context) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		alog.Console("closing mongodb pool")
 		CloseMongodbPool(ctx)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		alog.Console("closing mysql pool")
 		CloseMysqlPool()
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		alog.Console("closing rabbitmq pool")
 		CloseRabbitmqPool()
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		alog.Console("closing redis pool")
 		CloseRedisPool()
 	}()
 
