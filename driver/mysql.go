@@ -100,8 +100,8 @@ func NewMysql(app *core.App, cfgSection string) (string, *sql.DB, error) {
 }
 
 // NewMysqlPool
-// Warning: Do not close the returned client as it is managed by the pool
-// Warning: 使用完不要释放 client，释放是错误人为操作，直接 panic 即可，这里不做过度处理。
+// Warning: Do not unset the returned client as it is managed by the pool
+// Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
 func NewMysqlPool(app *core.App, cfgSection string) (string, *sql.DB, error) {
 	d, ok := mysqlClients.Load(cfgSection)
 	if ok {

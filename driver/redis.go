@@ -28,8 +28,8 @@ func NewRedis(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
 
 // NewRedisPool go-redis 是redis官方推出的，自带连接池、线程安全，不必手动操作
 // https://redis.uptrace.dev/guide/go-redis-debugging.html#connection-pool-size
-// Warning: Do not close the returned client as it is managed by the pool
-// Warning: 使用完不要释放 client，释放是错误人为操作，直接 panic 即可，这里不做过度处理。
+// Warning: Do not unset the returned client as it is managed by the pool
+// Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
 func NewRedisPool(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
 	cli, ok := redisClients.Load(cfgSection)
 	if ok {
@@ -38,6 +38,7 @@ func NewRedisPool(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
 		}
 		redisClients.Delete(cfgSection)
 	}
+
 	client, e := NewRedis(app, cfgSection)
 	if e != nil {
 		return nil, e

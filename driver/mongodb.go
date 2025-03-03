@@ -82,7 +82,6 @@ type MongodbOptions struct {
 	Credential        *MongodbCredential
 	ConnectionOptions *MongodbConnectionOptions
 }
-
 type MongodbClientData struct {
 	Client *mongo.Client
 	DB     string
@@ -108,8 +107,8 @@ func NewMongodb(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Er
 }
 
 // NewMongodbPool mongodb 自带连接池
-// Warning: Do not close the returned client as it is managed by the pool
-// Warning: 使用完不要释放 client，释放是错误人为操作，直接 panic 即可，这里不做过度处理。
+// Warning: Do not unset the returned client as it is managed by the pool
+// Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
 func NewMongodbPool(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
 	d, ok := mongodbClients.Load(cfgSection)
 	if ok {

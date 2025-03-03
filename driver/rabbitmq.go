@@ -8,6 +8,7 @@ import (
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/wagslane/go-rabbitmq"
+	"sync"
 	"time"
 )
 
@@ -20,10 +21,12 @@ type RabbitmqConfig struct {
 	Password string
 }
 
-func (c RabbitmqConfig) Url() string {
-	return fmt.Sprintf("amqp://%s:%s@%s%s", c.User, c.Password, c.Host, c.ConnectionOptions.Vhost)
-}
+var (
+	rabbitmqClients sync.Map
+)
 
+// NewRabbitmq
+// Note: better use NewRabbitmqPool instead
 func NewRabbitmq(app *core.App, cfgSection string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
 	c, err := ParseRabbitmqConfig(app, cfgSection, tlsConfig, sasl)
 	if err != nil {
@@ -46,6 +49,25 @@ func NewRabbitmq(app *core.App, cfgSection string, tlsConfig *tls.Config, sasl [
 		return nil, NewRabbitmqError(err)
 	}
 	return conn, nil
+}
+
+// NewRabbitmqPool
+// Warning: Do not unset the returned client as it is managed by the pool
+// Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
+func NewRabbitmqPool(app *core.App, cfgSection string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
+	cli, ok := rabbitmqClients.Load(cfgSection)
+	if ok {
+		if cli != nil {
+			return cli.(*rabbitmq.Conn), nil
+		}
+		rabbitmqClients.Delete(cfgSection)
+	}
+	client, err := NewRabbitmq(app, cfgSection, tlsConfig, sasl, opts)
+	if err != nil {
+		return nil, err
+	}
+	rabbitmqClients.Store(cfgSection, client)
+	return client, nil
 }
 
 func ParseRabbitmqConfig(app *core.App, section string, tlsConfig *tls.Config, sasl []amqp091.Authentication) (RabbitmqConfig, error) {
@@ -84,7 +106,9 @@ func ParseRabbitmqConfig(app *core.App, section string, tlsConfig *tls.Config, s
 	}
 	return c, nil
 }
-
+func (c RabbitmqConfig) Url() string {
+	return fmt.Sprintf("amqp://%s:%s@%s%s", c.User, c.Password, c.Host, c.ConnectionOptions.Vhost)
+}
 func NewRabbitmqError(err error, details ...any) *ae.Error {
 	if err == nil {
 		return nil
