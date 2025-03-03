@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"go.mongodb.org/mongo-driver/v2/mongo/writeconcern"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -82,20 +83,53 @@ type MongodbOptions struct {
 	ConnectionOptions *MongodbConnectionOptions
 }
 
-// mongodb 自带连接池
-func NewMongoDB(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
+type MongodbClientData struct {
+	Client *mongo.Client
+	DB     string
+}
+
+var (
+	mongodbClients sync.Map
+)
+
+// NewMongodb
+// Note: better use NewMongodbPool instead
+func NewMongodb(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
 	o, err := ParseMongodbConfig(app, cfgSection)
 	if err != nil {
 		return nil, "", NewMongodbError(err, "parse mongodb config section: "+cfgSection)
 	}
 	opts := o.ClientOptions()
-	cli, err := mongo.Connect(opts)
-	if err != nil {
+	var client *mongo.Client
+	if client, err = mongo.Connect(opts); err != nil {
 		return nil, "", NewMongodbError(err, "connect to mongodb instance "+o.Hosts)
 	}
-
-	return cli, o.DB, nil
+	return client, o.DB, nil
 }
+
+// NewMongodbPool mongodb 自带连接池
+// Warning: Do not close the returned client as it is managed by the pool
+// Warning: 使用完不要释放 client，释放是错误人为操作，直接 panic 即可，这里不做过度处理。
+func NewMongodbPool(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
+	d, ok := mongodbClients.Load(cfgSection)
+	if ok {
+		clientData := d.(MongodbClientData)
+		if clientData.Client != nil {
+			return clientData.Client, clientData.DB, nil
+		}
+		mongodbClients.Delete(cfgSection)
+	}
+	client, db, e := NewMongodb(app, cfgSection)
+	if e != nil {
+		return nil, "", e
+	}
+	mongodbClients.LoadOrStore(cfgSection, MongodbClientData{
+		Client: client,
+		DB:     db,
+	})
+	return client, db, nil
+}
+
 func (c *MongodbCredential) ToCredential() options.Credential {
 	// PasswordSet: For GSSAPI, this must be true if a password is specified, even if the password is the empty string, and
 	// false if no password is specified, indicating that the password should be taken from the context of the running

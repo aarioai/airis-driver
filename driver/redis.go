@@ -8,20 +8,42 @@ import (
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
 	"github.com/redis/go-redis/v9"
+	"sync"
 	"time"
 )
 
-/*
-	go-redis 是redis官方推出的，自带连接池，不必手动操作
+var (
+	redisClients sync.Map
+)
 
-https://redis.uptrace.dev/guide/go-redis-debugging.html#connection-pool-size
-*/
+// NewRedis
+// Note: better use NewRedisPool instead
 func NewRedis(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
 	opts, err := ParseRedisConfig(app, cfgSection)
 	if err != nil {
 		return nil, NewRedisError(err)
 	}
 	return redis.NewClient(opts), nil
+}
+
+// NewRedisPool go-redis 是redis官方推出的，自带连接池、线程安全，不必手动操作
+// https://redis.uptrace.dev/guide/go-redis-debugging.html#connection-pool-size
+// Warning: Do not close the returned client as it is managed by the pool
+// Warning: 使用完不要释放 client，释放是错误人为操作，直接 panic 即可，这里不做过度处理。
+func NewRedisPool(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
+	cli, ok := redisClients.Load(cfgSection)
+	if ok {
+		if cli != nil {
+			return cli.(*redis.Client), nil
+		}
+		redisClients.Delete(cfgSection)
+	}
+	client, e := NewRedis(app, cfgSection)
+	if e != nil {
+		return nil, e
+	}
+	redisClients.LoadOrStore(cfgSection, client)
+	return client, nil
 }
 
 func ParseRedisConfig(app *core.App, section string) (*redis.Options, error) {

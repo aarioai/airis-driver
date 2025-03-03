@@ -26,7 +26,7 @@ func NewDB(app *core.App, section string) *Model {
 }
 
 func (m *Model) DB() (*mongo.Client, *mongo.Database, *ae.Error) {
-	client, db, e := driver.NewMongoDB(m.app, m.section)
+	client, db, e := driver.NewMongodbPool(m.app, m.section)
 	if e != nil {
 		return nil, nil, e
 	}

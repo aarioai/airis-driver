@@ -3,13 +3,13 @@ module github.com/aarioai/airis-driver
 go 1.23.6
 
 require (
-	github.com/aarioai/airis v0.1.141
+	github.com/aarioai/airis v0.1.142
 	github.com/go-sql-driver/mysql v1.9.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.7.1
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.mongodb.org/mongo-driver/v2 v2.1.0
-	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
+	golang.org/x/exp v0.0.0-20250228200357-dead58393ab7
 )
 
 require (
