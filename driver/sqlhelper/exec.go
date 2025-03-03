@@ -13,35 +13,15 @@ import (
 
 type DB struct {
 	Schema string
-	close  bool
 	DB     *sql.DB
 	err    error
 }
 
-func AliveDriver(schema string, db *sql.DB, close bool, err error) *DB {
+func NewDriver(schema string, db *sql.DB, err error) *DB {
 	return &DB{
 		Schema: schema,
-		close:  close,
 		DB:     db,
 		err:    err,
-	}
-}
-
-func Driver(schema string, db *sql.DB, err error) *DB {
-	return &DB{
-		close: true,
-		DB:    db,
-		err:   err,
-	}
-}
-
-func (d *DB) Close() {
-	if d.close && d.DB != nil {
-		/*
-			https://pkg.go.dev/database/sql#Open
-			The returned DB is safe for concurrent use by multiple goroutines and maintains its own pool of idle connections. Thus, the Open function should be called just once. It is rarely necessary to close a DB.
-		*/
-		alog.LogOnError(d.DB.Close())
 	}
 }
 

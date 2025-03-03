@@ -73,7 +73,6 @@ func tryGetSectionCfg(app *core.App, base, section string, key string, defaultVa
 	return v, err
 }
 
-// CloseAllPools
 func CloseAllPools(ctx context.Context) {
 	var wg sync.WaitGroup
 	wg.Add(1)
