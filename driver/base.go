@@ -1,9 +1,11 @@
 package driver
 
 import (
+	"context"
 	"github.com/aarioai/airis/core"
 	"github.com/aarioai/airis/pkg/afmt"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -69,4 +71,34 @@ func tryGetSectionCfg(app *core.App, base, section string, key string, defaultVa
 		v = defaultV
 	}
 	return v, err
+}
+
+// CloseAllPools
+func CloseAllPools(ctx context.Context) {
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		CloseMongodbPool(ctx)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		CloseMysqlPool()
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		CloseRabbitmqPool()
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		CloseRedisPool()
+	}()
+
+	wg.Wait()
 }
