@@ -15,6 +15,7 @@ import (
 type EntityInterface interface {
 	Table() string
 }
+
 type Model struct {
 	app     *core.App
 	section string
@@ -32,6 +33,7 @@ func (m *Model) DB() (*mongo.Client, *mongo.Database, *ae.Error) {
 	}
 	return client, client.Database(db), nil
 }
+
 func (m *Model) CreateIndexes(ctx context.Context, t index.Entity) *ae.Error {
 	_, db, e := m.DB()
 	if e != nil {
@@ -47,6 +49,7 @@ func (m *Model) AggregateRaw(ctx context.Context, t EntityInterface, pipeline in
 	}
 	return AggregateRaw(ctx, db, t, pipeline, opts...)
 }
+
 func (m *Model) Aggregate(ctx context.Context, results interface{}, t EntityInterface, pipeline interface{}, opts ...options.Lister[options.AggregateOptions]) *ae.Error {
 	_, db, e := m.DB()
 	if e != nil {
@@ -54,6 +57,7 @@ func (m *Model) Aggregate(ctx context.Context, results interface{}, t EntityInte
 	}
 	return Aggregate(ctx, results, db, t, pipeline, opts...)
 }
+
 func (m *Model) CountDocuments(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.CountOptions]) (int64, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
@@ -61,6 +65,7 @@ func (m *Model) CountDocuments(ctx context.Context, t EntityInterface, filter in
 	}
 	return CountDocuments(ctx, db, t, filter, opts...)
 }
+
 func (m *Model) DeleteOne(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {

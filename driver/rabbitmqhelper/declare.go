@@ -20,6 +20,7 @@ func NewConsumer(conn *rabbitmq.Conn, declare Declare, options ...func(*rabbitmq
 	}
 	return rabbitmq.NewConsumer(conn, declare.Queue, options...)
 }
+
 func DeclareConsumer(conn *rabbitmq.Conn, declare Declare, options ...func(*rabbitmq.ConsumerOptions)) (*rabbitmq.Consumer, error) {
 	if len(options) == 0 {
 		options = make([]func(*rabbitmq.ConsumerOptions), 0, 1)
@@ -37,6 +38,7 @@ func NewPublisher(conn *rabbitmq.Conn, exchange string, options ...func(publishe
 	}
 	return rabbitmq.NewPublisher(conn, options...)
 }
+
 func DeclarePublisher(conn *rabbitmq.Conn, exchange string, options ...func(publisherOptions *rabbitmq.PublisherOptions)) (*rabbitmq.Publisher, error) {
 	if len(options) == 0 {
 		options = make([]func(*rabbitmq.PublisherOptions), 0, 1)
