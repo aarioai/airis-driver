@@ -47,6 +47,19 @@ func NewRedisPool(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
 	return client, nil
 }
 
+// CloseRedisPool
+// Each process should utilize a single connection, which is managed by the main function.
+// This connection should be closed when the main function terminates.
+func CloseRedisPool() {
+	redisClients.Range(func(k, v interface{}) bool {
+		client := v.(*redis.Client)
+		if client != nil {
+			return client.Close() == nil
+		}
+		return true
+	})
+}
+
 func ParseRedisConfig(app *core.App, section string) (*redis.Options, error) {
 	var connTimeout, readTimeout, writeTimeout time.Duration
 	if section == "" {

@@ -70,6 +70,19 @@ func NewRabbitmqPool(app *core.App, cfgSection string, tlsConfig *tls.Config, sa
 	return client, nil
 }
 
+// CloseRabbitmqPool
+// Each process should utilize a single connection, which is managed by the main function.
+// This connection should be closed when the main function terminates.
+func CloseRabbitmqPool() {
+	rabbitmqClients.Range(func(k, v interface{}) bool {
+		client := v.(*rabbitmq.Conn)
+		if client != nil {
+			return client.Close() == nil
+		}
+		return true
+	})
+}
+
 func ParseRabbitmqConfig(app *core.App, section string, tlsConfig *tls.Config, sasl []amqp091.Authentication) (RabbitmqConfig, error) {
 	host, err1 := tryGetSectionCfg(app, "rabbitmq", section, "host")
 	user, err2 := tryGetSectionCfg(app, "rabbitmq", section, "user")

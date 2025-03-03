@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"context"
 	"errors"
 	"github.com/aarioai/airis/core"
 	"github.com/aarioai/airis/core/ae"
@@ -127,6 +128,20 @@ func NewMongodbPool(app *core.App, cfgSection string) (*mongo.Client, string, *a
 		DB:     db,
 	})
 	return client, db, nil
+}
+
+// CloseMongodbPool
+// Each process should utilize a single connection, which is managed by the main function.
+// This connection should be closed when the main function terminates.
+func CloseMongodbPool(ctx context.Context) {
+	mongodbClients.Range(func(k, v interface{}) bool {
+		clientData := v.(MongodbClientData)
+		client := clientData.Client
+		if client != nil {
+			return client.Disconnect(ctx) == nil
+		}
+		return true
+	})
 }
 
 func (c *MongodbCredential) ToCredential() options.Credential {

@@ -1,14 +1,13 @@
 package driver
 
 import (
-	"context"
 	"database/sql"
 	"database/sql/driver"
 	"errors"
 	"fmt"
 	"github.com/aarioai/airis/core"
 	"github.com/aarioai/airis/core/ae"
-	"github.com/aarioai/airis/core/airis"
+	"github.com/aarioai/airis/core/alog"
 	"github.com/aarioai/airis/core/atype"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
@@ -77,8 +76,7 @@ func NewMysql(app *core.App, cfgSection string) (string, *sql.DB, error) {
 	rt := f.ReadTimeout.Seconds()
 	wt := f.WriteTimeout.Seconds()
 	src := fmt.Sprintf("%s:%s@tcp(%s)/%s?timeout=%.1fs&readTimeout=%.1fs&writeTimeout=%.1fs", f.User, f.Password, f.Host, f.Schema, ct, rt, wt)
-	ctx := airis.JobContext(context.Background())
-	app.Log.Debug(ctx, "MySQL schema:%s, %s@%s", f.Schema, f.User, f.Host)
+	alog.Console("connect mysql: %s@%s %s", f.User, f.Host, f.Schema)
 	// sql.Open并不会立即建立一个数据库的网络连接, 也不会对数据库链接参数的合法性做检验, 它仅仅是初始化一个sql.DB对象. 当真正进行第一次数据库查询操作时, 此时才会真正建立网络连接;
 	// sql.Open返回的sql.DB对象是协程并发安全的.
 	// sql.DB表示操作数据库的抽象接口的对象，但不是所谓的数据库连接对象，sql.DB对象只有当需要使用时才会创建连接，如果想立即验证连接，需要用Ping()方法;
@@ -91,11 +89,11 @@ func NewMysql(app *core.App, cfgSection string) (string, *sql.DB, error) {
 	}
 
 	// It is rare to Close a db, as the db handle is meant to be long-lived and shared between many goroutines.
-	//defer conn.Close() // 这是长连接
 	conn.SetMaxIdleConns(f.Pool.MaxIdleConns) // 设置闲置的连接数
 	conn.SetMaxOpenConns(f.Pool.MaxOpenConns) // 设置最大打开的连接数，默认值为0表示不限制
 	conn.SetConnMaxLifetime(f.Pool.ConnMaxLifetime)
 	conn.SetConnMaxIdleTime(f.Pool.ConnMaxIdleTime)
+
 	return f.Schema, conn, err
 }
 
@@ -120,6 +118,20 @@ func NewMysqlPool(app *core.App, cfgSection string) (string, *sql.DB, error) {
 		Client: db,
 	})
 	return schema, db, nil
+}
+
+// CloseMysqlPool
+// Each process should utilize a single connection, which is managed by the main function.
+// This connection should be closed when the main function terminates.
+func CloseMysqlPool() {
+	mysqlClients.Range(func(k, v interface{}) bool {
+		clientData := v.(MysqlClientData)
+		client := clientData.Client
+		if client != nil {
+			return client.Close() == nil
+		}
+		return true
+	})
 }
 
 // func keepalive(app *aa.App) {
