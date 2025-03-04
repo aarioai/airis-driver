@@ -5,10 +5,10 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/ae"
-	"github.com/aarioai/airis/core/alog"
-	"github.com/aarioai/airis/core/atype"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/alog"
+	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
 	_ "github.com/go-sql-driver/mysql" // 需要引入
@@ -66,7 +66,7 @@ var (
 
 // NewMysql
 // Note: better use NewMysqlPool instead
-func NewMysql(app *core.App, cfgSection string) (string, *sql.DB, error) {
+func NewMysql(app *aa.App, cfgSection string) (string, *sql.DB, error) {
 	f, err := ParseMysqlConfig(app, cfgSection)
 
 	if err != nil {
@@ -100,7 +100,7 @@ func NewMysql(app *core.App, cfgSection string) (string, *sql.DB, error) {
 // NewMysqlPool
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewMysqlPool(app *core.App, cfgSection string) (string, *sql.DB, error) {
+func NewMysqlPool(app *aa.App, cfgSection string) (string, *sql.DB, error) {
 	d, ok := mysqlClients.Load(cfgSection)
 	if ok {
 		clientData := d.(MysqlClientData)
@@ -149,7 +149,7 @@ func CloseMysqlPool() {
 // 	}
 // }
 
-func ParseMysqlConfig(app *core.App, section string) (MysqlOptions, error) {
+func ParseMysqlConfig(app *aa.App, section string) (MysqlOptions, error) {
 	if section == "" {
 		section = "mysql"
 	}

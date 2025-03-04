@@ -2,8 +2,8 @@ package driver_test
 
 import (
 	"github.com/aarioai/airis-driver/driver"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/aconfig"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/aconfig"
 	"testing"
 	"time"
 )
@@ -13,7 +13,7 @@ func TestParseIni(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := core.New(c, nil)
+	app := aa.New(c, nil)
 
 	mysqlTestOpt := driver.MysqlOptions{
 		Schema:       "test",
@@ -33,7 +33,7 @@ func TestParseIni(t *testing.T) {
 	testMySQLConfig(t, app, "test", mysqlTestOpt)
 	testMySQLConfig(t, app, "hello", mysqlHelloOpt)
 }
-func testMySQLConfig(t *testing.T, app *core.App, want string, suppose driver.MysqlOptions) {
+func testMySQLConfig(t *testing.T, app *aa.App, want string, suppose driver.MysqlOptions) {
 	mysqlConfig, err := driver.ParseMysqlConfig(app, want)
 	if err != nil {
 		t.Fatal(err.Error())

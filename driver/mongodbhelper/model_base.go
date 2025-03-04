@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis-driver/driver/index"
-	"github.com/aarioai/airis/core/ae"
+	"github.com/aarioai/airis/aa/ae"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"

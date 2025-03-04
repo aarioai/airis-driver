@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/aarioai/airis/core/ae"
-	"github.com/aarioai/airis/core/atype"
+	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
 	"strings"
 )

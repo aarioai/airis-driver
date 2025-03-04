@@ -2,8 +2,8 @@ package driver
 
 import (
 	"context"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/alog"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/alog"
 	"github.com/aarioai/airis/pkg/afmt"
 	"strings"
 	"sync"
@@ -54,7 +54,7 @@ func ParseTimeouts(t string, defaultTimeouts ...time.Duration) (conn time.Durati
 	return
 }
 
-func tryGetSectionCfg(app *core.App, base, section string, key string, defaultValue ...string) (string, error) {
+func tryGetSectionCfg(app *aa.App, base, section string, key string, defaultValue ...string) (string, error) {
 	k := section + "." + key
 	v, err := app.Config.MustGetString(k)
 	defaultV := afmt.First(defaultValue)

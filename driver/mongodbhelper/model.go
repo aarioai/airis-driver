@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis-driver/driver/index"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/ae"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/ae"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -17,12 +17,12 @@ type EntityInterface interface {
 }
 
 type Model struct {
-	app     *core.App
+	app     *aa.App
 	section string
 	loc     *time.Location
 }
 
-func NewDB(app *core.App, section string) *Model {
+func NewDB(app *aa.App, section string) *Model {
 	return &Model{app: app, section: section, loc: app.Config.TimeLocation}
 }
 

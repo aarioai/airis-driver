@@ -1,7 +1,7 @@
 package sqlhelper
 
 import (
-	"github.com/aarioai/airis/core/atype"
+	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
 	"strings"
 )

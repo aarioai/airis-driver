@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/aarioai/airis-driver/driver"
-	"github.com/aarioai/airis/core/ae"
-	"github.com/aarioai/airis/core/alog"
+	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/alog"
 	"github.com/aarioai/airis/pkg/afmt"
 	"log"
 )

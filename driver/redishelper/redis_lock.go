@@ -3,7 +3,7 @@ package redishelper
 import (
 	"context"
 	"github.com/aarioai/airis-driver/driver"
-	"github.com/aarioai/airis/core/ae"
+	"github.com/aarioai/airis/aa/ae"
 	"github.com/redis/go-redis/v9"
 	"time"
 )

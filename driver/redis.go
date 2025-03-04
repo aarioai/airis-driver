@@ -2,9 +2,9 @@ package driver
 
 import (
 	"errors"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/ae"
-	"github.com/aarioai/airis/core/atype"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
 	"github.com/redis/go-redis/v9"
@@ -18,7 +18,7 @@ var (
 
 // NewRedis
 // Note: better use NewRedisPool instead
-func NewRedis(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
+func NewRedis(app *aa.App, cfgSection string) (*redis.Client, *ae.Error) {
 	opts, err := ParseRedisConfig(app, cfgSection)
 	if err != nil {
 		return nil, NewRedisError(err)
@@ -30,7 +30,7 @@ func NewRedis(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
 // https://redis.uptrace.dev/guide/go-redis-debugging.html#connection-pool-size
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewRedisPool(app *core.App, cfgSection string) (*redis.Client, *ae.Error) {
+func NewRedisPool(app *aa.App, cfgSection string) (*redis.Client, *ae.Error) {
 	cli, ok := redisClients.Load(cfgSection)
 	if ok {
 		if cli != nil {
@@ -60,7 +60,7 @@ func CloseRedisPool() {
 	})
 }
 
-func ParseRedisConfig(app *core.App, section string) (*redis.Options, error) {
+func ParseRedisConfig(app *aa.App, section string) (*redis.Options, error) {
 	var connTimeout, readTimeout, writeTimeout time.Duration
 	if section == "" {
 		section = "redis"

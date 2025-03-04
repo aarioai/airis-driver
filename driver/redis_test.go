@@ -2,8 +2,8 @@ package driver_test
 
 import (
 	"github.com/aarioai/airis-driver/driver"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/aconfig"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/aconfig"
 	"github.com/redis/go-redis/v9"
 	"testing"
 )
@@ -13,7 +13,7 @@ func TestRedis(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := core.New(c, nil)
+	app := aa.New(c, nil)
 
 	testRedisOpt := redis.Options{
 		Password: "Luexu.com",
@@ -30,7 +30,7 @@ func TestRedis(t *testing.T) {
 	testRedisConfig(t, app, "test", testRedisOpt)
 	testRedisConfig(t, app, "redis_test2", test2RedisOpt)
 }
-func testRedisConfig(t *testing.T, app *core.App, section string, want redis.Options) {
+func testRedisConfig(t *testing.T, app *aa.App, section string, want redis.Options) {
 	test, err := driver.ParseRedisConfig(app, section)
 	if err != nil {
 		t.Fatal(err.Error())

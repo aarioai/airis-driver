@@ -3,8 +3,8 @@ package driver
 import (
 	"context"
 	"errors"
-	"github.com/aarioai/airis/core"
-	"github.com/aarioai/airis/core/ae"
+	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -94,7 +94,7 @@ var (
 
 // NewMongodb
 // Note: better use NewMongodbPool instead
-func NewMongodb(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
+func NewMongodb(app *aa.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
 	o, err := ParseMongodbConfig(app, cfgSection)
 	if err != nil {
 		return nil, "", NewMongodbError(err, "parse mongodb config section: "+cfgSection)
@@ -110,7 +110,7 @@ func NewMongodb(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Er
 // NewMongodbPool mongodb 自带连接池
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewMongodbPool(app *core.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
+func NewMongodbPool(app *aa.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
 	d, ok := mongodbClients.Load(cfgSection)
 	if ok {
 		clientData := d.(MongodbClientData)
@@ -171,7 +171,7 @@ func (o *MongodbOptions) ClientOptions() *options.ClientOptions {
 	}
 	return opts
 }
-func ParseMongodbConfig(app *core.App, section string) (*MongodbOptions, error) {
+func ParseMongodbConfig(app *aa.App, section string) (*MongodbOptions, error) {
 	hosts, err := tryGetSectionCfg(app, "mongodb", section, "hosts")
 	if err != nil {
 		return nil, err

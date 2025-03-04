@@ -2,7 +2,7 @@ package driver
 
 import (
 	"context"
-	"github.com/aarioai/airis/core/alog"
+	"github.com/aarioai/airis/aa/alog"
 	"github.com/wagslane/go-rabbitmq"
 )
 

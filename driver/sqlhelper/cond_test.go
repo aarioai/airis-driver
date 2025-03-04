@@ -2,7 +2,7 @@ package sqlhelper_test
 
 import (
 	"github.com/aarioai/airis-driver/driver/sqlhelper"
-	"github.com/aarioai/airis/core/aenum"
+	"github.com/aarioai/airis/aa/aenum"
 	"testing"
 )
 
