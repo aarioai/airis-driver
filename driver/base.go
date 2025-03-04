@@ -82,28 +82,28 @@ func CloseAllPools(ctx context.Context) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		alog.Console("closing mongodb pool")
+		alog.Stop("mongodb pool")
 		CloseMongodbPool(ctx)
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		alog.Console("closing mysql pool")
+		alog.Stop("mysql pool")
 		CloseMysqlPool()
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		alog.Console("closing rabbitmq pool")
+		alog.Stop("rabbitmq pool")
 		CloseRabbitmqPool()
 	}()
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		alog.Console("closing redis pool")
+		alog.Stop("redis pool")
 		CloseRedisPool()
 	}()
 
