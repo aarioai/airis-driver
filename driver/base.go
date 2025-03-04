@@ -75,6 +75,9 @@ func tryGetSectionCfg(app *aa.App, base, section string, key string, defaultValu
 }
 
 func CloseAllPools(ctx context.Context) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	var wg sync.WaitGroup
 	wg.Add(1)
 	go func() {
