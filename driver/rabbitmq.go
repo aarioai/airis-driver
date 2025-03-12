@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/aarioai/airis/aa"
 	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/alog"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/wagslane/go-rabbitmq"
@@ -77,6 +78,7 @@ func CloseRabbitmqPool() {
 	rabbitmqClients.Range(func(k, v interface{}) bool {
 		client := v.(*rabbitmq.Conn)
 		if client != nil {
+			alog.Stop("rabbitmq client: %s", k)
 			return client.Close() == nil
 		}
 		return true

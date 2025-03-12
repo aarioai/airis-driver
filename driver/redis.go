@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/aarioai/airis/aa"
 	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/alog"
 	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
@@ -54,6 +55,7 @@ func CloseRedisPool() {
 	redisClients.Range(func(k, v interface{}) bool {
 		client := v.(*redis.Client)
 		if client != nil {
+			alog.Stop("redis client: %s", k)
 			return client.Close() == nil
 		}
 		return true

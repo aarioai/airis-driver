@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/aarioai/airis/aa"
 	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/alog"
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -138,6 +139,7 @@ func CloseMongodbPool(ctx context.Context) {
 		clientData := v.(MongodbClientData)
 		client := clientData.Client
 		if client != nil {
+			alog.Stop("mongodb client: %s", k)
 			return client.Disconnect(ctx) == nil
 		}
 		return true

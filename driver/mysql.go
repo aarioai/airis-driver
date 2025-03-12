@@ -128,6 +128,7 @@ func CloseMysqlPool() {
 		clientData := v.(MysqlClientData)
 		client := clientData.Client
 		if client != nil {
+			alog.Stop("mysql client: %s", k)
 			return client.Close() == nil
 		}
 		return true
