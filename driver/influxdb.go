@@ -103,8 +103,10 @@ func (c InfluxdbConfig) Options(defaultTags map[string]string) *influxdb2.Option
 }
 
 type InfluxdbClientData struct {
-	Client        influxdb2.Client
-	DefaultWriter api.WriteAPI
+	Client               influxdb2.Client
+	DefaultQuery         api.QueryAPI
+	DefaultWrite         api.WriteAPI
+	DefaultWriteBlocking api.WriteAPIBlocking
 }
 
 var (
@@ -126,25 +128,29 @@ func NewInfluxdb(app *aa.App, cfgSection string, defaultTags map[string]string) 
 // NewInfluxdbPool
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewInfluxdbPool(app *aa.App, cfgSection string, defaultTags map[string]string) (influxdb2.Client, api.WriteAPI, *ae.Error) {
+func NewInfluxdbPool(app *aa.App, cfgSection string, defaultTags map[string]string) (influxdb2.Client, api.QueryAPI, api.WriteAPI, api.WriteAPIBlocking, *ae.Error) {
 	d, ok := influxdbClients.Load(cfgSection)
 	if ok {
-		clientData := d.(InfluxdbClientData)
-		if clientData.Client != nil {
-			return clientData.Client, clientData.DefaultWriter, nil
+		t := d.(InfluxdbClientData)
+		if t.Client != nil && t.DefaultQuery != nil && t.DefaultWrite != nil && t.DefaultWriteBlocking != nil {
+			return t.Client, t.DefaultQuery, t.DefaultWrite, t.DefaultWriteBlocking, nil
 		}
 		influxdbClients.Delete(cfgSection)
 	}
 	client, org, bucket, e := NewInfluxdb(app, cfgSection, defaultTags)
 	if e != nil {
-		return nil, nil, e
+		return nil, nil, nil, nil, e
 	}
-	writer := client.WriteAPI(org, bucket)
+	query := client.QueryAPI(org)
+	write := client.WriteAPI(org, bucket)
+	writeBlocking := client.WriteAPIBlocking(org, bucket)
 	influxdbClients.LoadOrStore(cfgSection, InfluxdbClientData{
-		Client:        client,
-		DefaultWriter: writer,
+		Client:               client,
+		DefaultQuery:         query,
+		DefaultWrite:         write,
+		DefaultWriteBlocking: writeBlocking,
 	})
-	return client, writer, nil
+	return client, query, write, writeBlocking, nil
 }
 
 // CloseInfluxdbPool
