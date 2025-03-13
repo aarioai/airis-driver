@@ -24,8 +24,8 @@ const (
 )
 
 func (d *DB) Begin(ctx context.Context, opts *sql.TxOptions) (*Tx, *ae.Error) {
-	if d.err != nil {
-		return nil, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return nil, d.error
 	}
 	tx, err := d.DB.BeginTx(ctx, opts)
 	if err != nil {

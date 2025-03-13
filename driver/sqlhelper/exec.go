@@ -14,14 +14,14 @@ import (
 type DB struct {
 	Schema string
 	DB     *sql.DB
-	err    error
+	error  *ae.Error
 }
 
-func NewDriver(schema string, db *sql.DB, err error) *DB {
+func NewDriver(schema string, db *sql.DB, e *ae.Error) *DB {
 	return &DB{
 		Schema: schema,
 		DB:     db,
-		err:    err,
+		error:  e,
 	}
 }
 
@@ -29,8 +29,8 @@ func NewDriver(schema string, db *sql.DB, err error) *DB {
 // 不要忘记 stmt.Close() 释放连接池资源
 // Prepared statements take up server resources and should be closed after use.
 func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
-	if d.err != nil {
-		return nil, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return nil, d.error
 	}
 	stmt, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
@@ -46,23 +46,24 @@ func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 stmt close 必须要等到相关都执行完（包括  res.LastInsertId()  ,  row.Scan()
 */
 func (d *DB) Execute(ctx context.Context, query string, args ...any) (sql.Result, *ae.Error) {
-	if d.err != nil {
-		return nil, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return nil, d.error
 	}
 	res, err := d.DB.ExecContext(ctx, query, args...)
 	return res, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 func (d *DB) Exec(ctx context.Context, query string, args ...any) *ae.Error {
-	if d.err != nil {
-		return driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return d.error
 	}
 	_, e := d.Execute(ctx, query, args...)
 	return e
 }
+
 func (d *DB) Insert(ctx context.Context, query string, args ...any) (uint, *ae.Error) {
-	if d.err != nil {
-		return 0, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return 0, d.error
 	}
 	res, e := d.Execute(ctx, query, args...)
 	if e != nil {
@@ -74,8 +75,8 @@ func (d *DB) Insert(ctx context.Context, query string, args ...any) (uint, *ae.E
 }
 
 func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.Error) {
-	if d.err != nil {
-		return 0, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return 0, d.error
 	}
 	res, e := d.Execute(ctx, query, args...)
 	if e != nil {
@@ -108,16 +109,16 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 //}
 
 func (d *DB) QueryRow(ctx context.Context, query string, args ...any) (*sql.Row, *ae.Error) {
-	if d.err != nil {
-		return nil, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return nil, d.error
 	}
 	row := d.DB.QueryRowContext(ctx, query, args...)
 	return row, driver.NewMysqlError(row.Err(), afmt.Sprintf(query, args...))
 }
 
 func (d *DB) ScanArgs(ctx context.Context, query string, args []any, dest ...any) *ae.Error {
-	if d.err != nil {
-		return driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return d.error
 	}
 	row, e := d.QueryRow(ctx, query, args...)
 	if e != nil {
@@ -126,8 +127,8 @@ func (d *DB) ScanArgs(ctx context.Context, query string, args []any, dest ...any
 	return driver.NewMysqlError(row.Scan(dest...), afmt.Sprintf(query, args...))
 }
 func (d *DB) ScanRow(ctx context.Context, query string, dest ...any) *ae.Error {
-	if d.err != nil {
-		return driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return d.error
 	}
 	row, e := d.QueryRow(ctx, query)
 	if e != nil {
@@ -137,8 +138,8 @@ func (d *DB) ScanRow(ctx context.Context, query string, dest ...any) *ae.Error {
 }
 
 func (d *DB) Scan(ctx context.Context, query string, id uint64, dest ...any) *ae.Error {
-	if d.err != nil {
-		return driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return d.error
 	}
 	row, e := d.QueryRow(ctx, query, id)
 	if e != nil {
@@ -147,8 +148,8 @@ func (d *DB) Scan(ctx context.Context, query string, id uint64, dest ...any) *ae
 	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 func (d *DB) ScanX(ctx context.Context, query string, id string, dest ...any) *ae.Error {
-	if d.err != nil {
-		return driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return d.error
 	}
 	row, e := d.QueryRow(ctx, query, id)
 	if e != nil {
@@ -161,8 +162,8 @@ func (d *DB) ScanX(ctx context.Context, query string, id string, dest ...any) *a
 // 不要忘了关闭 rows
 // 只有 QueryRow 找不到才会返回 ae.ErrorNotFound；Query 即使不存在，也是 nil
 func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *ae.Error) {
-	if d.err != nil {
-		return nil, driver.NewMysqlError(d.err)
+	if d.error != nil {
+		return nil, d.error
 	}
 	rows, err := d.DB.QueryContext(ctx, query, args...)
 	if err != nil {
