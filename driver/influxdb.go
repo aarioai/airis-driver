@@ -99,6 +99,7 @@ func (c InfluxdbConfig) Options(defaultTags map[string]string) *influxdb2.Option
 	if c.ExponentialBase > 0 {
 		opts.SetExponentialBase(c.ExponentialBase)
 	}
+
 	return opts
 }
 
@@ -117,12 +118,19 @@ var (
 
 // NewInfluxdb
 // Note: better use NewInfluxdbPool instead
-func NewInfluxdb(app *aa.App, cfgSection string, defaultTags map[string]string) (influxdb2.Client, string, string, *ae.Error) {
-	c, err := ParseInfluxdbConfig(app, cfgSection)
+func NewInfluxdb(app *aa.App, section string, defaultTags map[string]string) (influxdb2.Client, string, string, *ae.Error) {
+	c, err := ParseInfluxdbConfig(app, section)
 	if err != nil {
-		return nil, "", "", NewInfluxdbError(err)
+		return nil, "", "", newConfigError(section, err)
 	}
+	// use config [httpc_influxdb_xxx]
+	httpClient, e := NewHttpClient(app, "httpc_"+section)
+	if e != nil {
+		return nil, "", "", e
+	}
+
 	opts := c.Options(defaultTags)
+	opts.SetHTTPClient(httpClient)
 	client := influxdb2.NewClientWithOptions(c.URL, c.Auth, opts)
 	return client, c.Org, c.Bucket, nil
 }
@@ -130,16 +138,16 @@ func NewInfluxdb(app *aa.App, cfgSection string, defaultTags map[string]string) 
 // NewInfluxdbPool
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewInfluxdbPool(app *aa.App, cfgSection string, defaultTags map[string]string) (InfluxdbClientData, *ae.Error) {
-	d, ok := influxdbClients.Load(cfgSection)
+func NewInfluxdbPool(app *aa.App, section string, defaultTags map[string]string) (InfluxdbClientData, *ae.Error) {
+	d, ok := influxdbClients.Load(section)
 	if ok {
 		t := d.(InfluxdbClientData)
 		if t.Client != nil && t.DefaultQuery != nil && t.DefaultWrite != nil && t.DefaultWriteBlocking != nil {
 			return t, nil
 		}
-		influxdbClients.Delete(cfgSection)
+		influxdbClients.Delete(section)
 	}
-	client, org, bucket, e := NewInfluxdb(app, cfgSection, defaultTags)
+	client, org, bucket, e := NewInfluxdb(app, section, defaultTags)
 	if e != nil {
 		return InfluxdbClientData{}, e
 	}
@@ -154,7 +162,7 @@ func NewInfluxdbPool(app *aa.App, cfgSection string, defaultTags map[string]stri
 		DefaultWrite:         write,
 		DefaultWriteBlocking: writeBlocking,
 	}
-	influxdbClients.LoadOrStore(cfgSection, result)
+	influxdbClients.LoadOrStore(section, result)
 	return result, nil
 }
 
@@ -214,6 +222,7 @@ func ParseInfluxdbConfig(app *aa.App, section string) (InfluxdbConfig, error) {
 	}
 	return c, nil
 }
+
 func NewInfluxdbError(err error) *ae.Error {
 	return ae.NewError(err)
 }

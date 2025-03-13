@@ -25,11 +25,11 @@ const (
 
 func (d *DB) Begin(ctx context.Context, opts *sql.TxOptions) (*Tx, *ae.Error) {
 	if d.err != nil {
-		return nil, driver.NewSQLError(d.err)
+		return nil, driver.NewMysqlError(d.err)
 	}
 	tx, err := d.DB.BeginTx(ctx, opts)
 	if err != nil {
-		return nil, driver.NewSQLError(err)
+		return nil, driver.NewMysqlError(err)
 	}
 	t := Tx{Tx: tx}
 	return &t, nil
@@ -37,12 +37,12 @@ func (d *DB) Begin(ctx context.Context, opts *sql.TxOptions) (*Tx, *ae.Error) {
 
 func (t *Tx) Rollback() *ae.Error {
 	t.result = rollback
-	return driver.NewSQLError(t.Tx.Rollback())
+	return driver.NewMysqlError(t.Tx.Rollback())
 }
 
 func (t *Tx) Commit() *ae.Error {
 	t.result = commit
-	return driver.NewSQLError(t.Tx.Commit())
+	return driver.NewMysqlError(t.Tx.Commit())
 }
 
 // defer tx.Recover
@@ -64,14 +64,14 @@ func (t *Tx) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 		if stmt != nil {
 			alog.LogOnError(stmt.Close())
 		}
-		return nil, driver.NewSQLError(err, query)
+		return nil, driver.NewMysqlError(err, query)
 	}
 	return stmt, nil
 }
 
 func (t *Tx) Execute(ctx context.Context, query string, args ...any) (sql.Result, *ae.Error) {
 	res, err := t.Tx.ExecContext(ctx, query, args...)
-	return res, driver.NewSQLError(err, afmt.Sprintf(query, args...))
+	return res, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 func (t *Tx) Exec(ctx context.Context, query string, args ...any) *ae.Error {
@@ -86,7 +86,7 @@ func (t *Tx) Insert(ctx context.Context, query string, args ...any) (uint, *ae.E
 	}
 	// 由于事务是先执行，后回滚或提交，所以可以先获取插入的ID，后commit()
 	id, err := res.LastInsertId()
-	return uint(id), driver.NewSQLError(err, afmt.Sprintf(query, args...))
+	return uint(id), driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 func (t *Tx) Update(ctx context.Context, query string, args ...any) (int64, *ae.Error) {
@@ -96,7 +96,7 @@ func (t *Tx) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 	}
 	// 由于事务是先执行，后回滚或提交，所以可以先获取更新结果，后commit()
 	id, err := res.RowsAffected()
-	return id, driver.NewSQLError(err, afmt.Sprintf(query, args...))
+	return id, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 // 批量查询
@@ -121,7 +121,7 @@ func (t *Tx) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 
 func (t *Tx) QueryRow(ctx context.Context, query string, args ...any) (*sql.Row, *ae.Error) {
 	row := t.Tx.QueryRowContext(ctx, query, args...)
-	return row, driver.NewSQLError(row.Err(), afmt.Sprintf(query, args...))
+	return row, driver.NewMysqlError(row.Err(), afmt.Sprintf(query, args...))
 }
 
 func (t *Tx) ScanArgs(ctx context.Context, query string, args []any, dest ...any) *ae.Error {
@@ -129,7 +129,7 @@ func (t *Tx) ScanArgs(ctx context.Context, query string, args []any, dest ...any
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), afmt.Sprintf(query, args...))
+	return driver.NewMysqlError(row.Scan(dest...), afmt.Sprintf(query, args...))
 }
 
 func (t *Tx) ScanRow(ctx context.Context, query string, dest ...any) *ae.Error {
@@ -137,7 +137,7 @@ func (t *Tx) ScanRow(ctx context.Context, query string, dest ...any) *ae.Error {
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), query)
+	return driver.NewMysqlError(row.Scan(dest...), query)
 }
 
 func (t *Tx) Scan(ctx context.Context, query string, id uint64, dest ...any) *ae.Error {
@@ -145,7 +145,7 @@ func (t *Tx) Scan(ctx context.Context, query string, id uint64, dest ...any) *ae
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), fmt.Sprintf(query, id))
+	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 
 func (t *Tx) ScanX(ctx context.Context, query string, id string, dest ...any) *ae.Error {
@@ -153,7 +153,7 @@ func (t *Tx) ScanX(ctx context.Context, query string, id string, dest ...any) *a
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), fmt.Sprintf(query, id))
+	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 
 // do not forget to close *sql.Rows
@@ -167,7 +167,7 @@ func (t *Tx) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ae.ErrorNoRows
 		}
-		return nil, driver.NewSQLError(err, afmt.Sprintf(query, args...))
+		return nil, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 	}
 	return rows, nil
 }

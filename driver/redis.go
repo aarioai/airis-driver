@@ -19,10 +19,10 @@ var (
 
 // NewRedis
 // Note: better use NewRedisPool instead
-func NewRedis(app *aa.App, cfgSection string) (*redis.Client, *ae.Error) {
-	opts, err := ParseRedisConfig(app, cfgSection)
+func NewRedis(app *aa.App, section string) (*redis.Client, *ae.Error) {
+	opts, err := ParseRedisConfig(app, section)
 	if err != nil {
-		return nil, NewRedisError(err)
+		return nil, newConfigError(section, err)
 	}
 	return redis.NewClient(opts), nil
 }
@@ -31,20 +31,20 @@ func NewRedis(app *aa.App, cfgSection string) (*redis.Client, *ae.Error) {
 // https://redis.uptrace.dev/guide/go-redis-debugging.html#connection-pool-size
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewRedisPool(app *aa.App, cfgSection string) (*redis.Client, *ae.Error) {
-	cli, ok := redisClients.Load(cfgSection)
+func NewRedisPool(app *aa.App, section string) (*redis.Client, *ae.Error) {
+	cli, ok := redisClients.Load(section)
 	if ok {
 		if cli != nil {
 			return cli.(*redis.Client), nil
 		}
-		redisClients.Delete(cfgSection)
+		redisClients.Delete(section)
 	}
 
-	client, e := NewRedis(app, cfgSection)
+	client, e := NewRedis(app, section)
 	if e != nil {
 		return nil, e
 	}
-	redisClients.LoadOrStore(cfgSection, client)
+	redisClients.LoadOrStore(section, client)
 	return client, nil
 }
 
@@ -64,10 +64,6 @@ func CloseRedisPool() {
 
 func ParseRedisConfig(app *aa.App, section string) (*redis.Options, error) {
 	var connTimeout, readTimeout, writeTimeout time.Duration
-	if section == "" {
-		section = "redis"
-	}
-
 	addr, err := tryGetSectionCfg(app, "redis", section, "addr")
 	if err != nil {
 		return nil, err

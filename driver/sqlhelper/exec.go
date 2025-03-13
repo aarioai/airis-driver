@@ -30,14 +30,14 @@ func NewDriver(schema string, db *sql.DB, err error) *DB {
 // Prepared statements take up server resources and should be closed after use.
 func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 	if d.err != nil {
-		return nil, driver.NewSQLError(d.err)
+		return nil, driver.NewMysqlError(d.err)
 	}
 	stmt, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		if stmt != nil {
 			alog.LogOnError(stmt.Close())
 		}
-		return nil, driver.NewSQLError(err, query)
+		return nil, driver.NewMysqlError(err, query)
 	}
 	return stmt, nil
 }
@@ -47,22 +47,22 @@ stmt close 必须要等到相关都执行完（包括  res.LastInsertId()  ,  ro
 */
 func (d *DB) Execute(ctx context.Context, query string, args ...any) (sql.Result, *ae.Error) {
 	if d.err != nil {
-		return nil, driver.NewSQLError(d.err)
+		return nil, driver.NewMysqlError(d.err)
 	}
 	res, err := d.DB.ExecContext(ctx, query, args...)
-	return res, driver.NewSQLError(err, afmt.Sprintf(query, args...))
+	return res, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 func (d *DB) Exec(ctx context.Context, query string, args ...any) *ae.Error {
 	if d.err != nil {
-		return driver.NewSQLError(d.err)
+		return driver.NewMysqlError(d.err)
 	}
 	_, e := d.Execute(ctx, query, args...)
 	return e
 }
 func (d *DB) Insert(ctx context.Context, query string, args ...any) (uint, *ae.Error) {
 	if d.err != nil {
-		return 0, driver.NewSQLError(d.err)
+		return 0, driver.NewMysqlError(d.err)
 	}
 	res, e := d.Execute(ctx, query, args...)
 	if e != nil {
@@ -70,12 +70,12 @@ func (d *DB) Insert(ctx context.Context, query string, args ...any) (uint, *ae.E
 	}
 	// 由于事务是先执行，后回滚或提交，所以可以先获取插入的ID，后commit()
 	id, err := res.LastInsertId()
-	return uint(id), driver.NewSQLError(err, afmt.Sprintf(query, args...))
+	return uint(id), driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.Error) {
 	if d.err != nil {
-		return 0, driver.NewSQLError(d.err)
+		return 0, driver.NewMysqlError(d.err)
 	}
 	res, e := d.Execute(ctx, query, args...)
 	if e != nil {
@@ -83,7 +83,7 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 	}
 	// 由于事务是先执行，后回滚或提交，所以可以先获取更新结果，后commit()
 	id, err := res.RowsAffected()
-	return id, driver.NewSQLError(err, afmt.Sprintf(query, args...))
+	return id, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 }
 
 // 批量查询
@@ -109,52 +109,52 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 
 func (d *DB) QueryRow(ctx context.Context, query string, args ...any) (*sql.Row, *ae.Error) {
 	if d.err != nil {
-		return nil, driver.NewSQLError(d.err)
+		return nil, driver.NewMysqlError(d.err)
 	}
 	row := d.DB.QueryRowContext(ctx, query, args...)
-	return row, driver.NewSQLError(row.Err(), afmt.Sprintf(query, args...))
+	return row, driver.NewMysqlError(row.Err(), afmt.Sprintf(query, args...))
 }
 
 func (d *DB) ScanArgs(ctx context.Context, query string, args []any, dest ...any) *ae.Error {
 	if d.err != nil {
-		return driver.NewSQLError(d.err)
+		return driver.NewMysqlError(d.err)
 	}
 	row, e := d.QueryRow(ctx, query, args...)
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), afmt.Sprintf(query, args...))
+	return driver.NewMysqlError(row.Scan(dest...), afmt.Sprintf(query, args...))
 }
 func (d *DB) ScanRow(ctx context.Context, query string, dest ...any) *ae.Error {
 	if d.err != nil {
-		return driver.NewSQLError(d.err)
+		return driver.NewMysqlError(d.err)
 	}
 	row, e := d.QueryRow(ctx, query)
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), query)
+	return driver.NewMysqlError(row.Scan(dest...), query)
 }
 
 func (d *DB) Scan(ctx context.Context, query string, id uint64, dest ...any) *ae.Error {
 	if d.err != nil {
-		return driver.NewSQLError(d.err)
+		return driver.NewMysqlError(d.err)
 	}
 	row, e := d.QueryRow(ctx, query, id)
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), fmt.Sprintf(query, id))
+	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 func (d *DB) ScanX(ctx context.Context, query string, id string, dest ...any) *ae.Error {
 	if d.err != nil {
-		return driver.NewSQLError(d.err)
+		return driver.NewMysqlError(d.err)
 	}
 	row, e := d.QueryRow(ctx, query, id)
 	if e != nil {
 		return e
 	}
-	return driver.NewSQLError(row.Scan(dest...), fmt.Sprintf(query, id))
+	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 
 // do not forget to close *sql.Rows
@@ -162,7 +162,7 @@ func (d *DB) ScanX(ctx context.Context, query string, id string, dest ...any) *a
 // 只有 QueryRow 找不到才会返回 ae.ErrorNotFound；Query 即使不存在，也是 nil
 func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *ae.Error) {
 	if d.err != nil {
-		return nil, driver.NewSQLError(d.err)
+		return nil, driver.NewMysqlError(d.err)
 	}
 	rows, err := d.DB.QueryContext(ctx, query, args...)
 	if err != nil {
@@ -172,7 +172,7 @@ func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ae.ErrorNoRows
 		}
-		return nil, driver.NewSQLError(err, afmt.Sprintf(query, args...))
+		return nil, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 	}
 	return rows, nil
 }

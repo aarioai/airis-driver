@@ -28,10 +28,10 @@ var (
 
 // NewRabbitmq
 // Note: better use NewRabbitmqPool instead
-func NewRabbitmq(app *aa.App, cfgSection string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
-	c, err := ParseRabbitmqConfig(app, cfgSection, tlsConfig, sasl)
+func NewRabbitmq(app *aa.App, section string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
+	c, err := ParseRabbitmqConfig(app, section, tlsConfig, sasl)
 	if err != nil {
-		return nil, ae.NewE("parse config: %s failed", cfgSection).WithDetail(err.Error())
+		return nil, newConfigError(section, err)
 	}
 
 	defaultOpts := []func(*rabbitmq.ConnectionOptions){
@@ -55,19 +55,19 @@ func NewRabbitmq(app *aa.App, cfgSection string, tlsConfig *tls.Config, sasl []a
 // NewRabbitmqPool
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewRabbitmqPool(app *aa.App, cfgSection string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
-	cli, ok := rabbitmqClients.Load(cfgSection)
+func NewRabbitmqPool(app *aa.App, section string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
+	cli, ok := rabbitmqClients.Load(section)
 	if ok {
 		if cli != nil {
 			return cli.(*rabbitmq.Conn), nil
 		}
-		rabbitmqClients.Delete(cfgSection)
+		rabbitmqClients.Delete(section)
 	}
-	client, err := NewRabbitmq(app, cfgSection, tlsConfig, sasl, opts)
+	client, err := NewRabbitmq(app, section, tlsConfig, sasl, opts)
 	if err != nil {
 		return nil, err
 	}
-	rabbitmqClients.Store(cfgSection, client)
+	rabbitmqClients.Store(section, client)
 	return client, nil
 }
 

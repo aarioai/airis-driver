@@ -13,8 +13,8 @@ github.com/Joker/jade v1.1.3/go.mod h1:T+2WLyt7VH6Lp0TRxQrUYEs64nRc83wkMQrfeIQKd
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
 github.com/Shopify/goreferrer v0.0.0-20240724165105-aceaa0259138 h1:gjbp60h8IZQbN/TpDaYJedWbbD1h1aDPEwWnYWaDaUY=
 github.com/Shopify/goreferrer v0.0.0-20240724165105-aceaa0259138/go.mod h1:NYezi6wtnJtBm5btoprXc5SvAdqH0XTXWnUup0MptAI=
-github.com/aarioai/airis v0.1.156 h1:t+4G0z82PDRynB0EFOXaFT0uDALXjCE8P8cH2vYIv7E=
-github.com/aarioai/airis v0.1.156/go.mod h1:vPggkwJKveagde0/bykFy6plELKkwYu8MVw4sVq8OH8=
+github.com/aarioai/airis v0.1.157 h1:8ojwu/4IF6TlKToTsZPorG6sQxW9RRnmySLzmYbITag=
+github.com/aarioai/airis v0.1.157/go.mod h1:waHWtn4i3FJDKSZknUyR/R9GlJCWIaN9247j4pGH/5g=
 github.com/ajg/form v1.5.1 h1:t9c7v8JUKu/XxOGBU0yjNpaMloxGEJhUkqFRq0ibGeU=
 github.com/ajg/form v1.5.1/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
 github.com/andybalholm/brotli v1.1.1 h1:PR2pgnyFznKEugtsUo0xLdDop5SKXd5Qf5ysW+7XdTA=

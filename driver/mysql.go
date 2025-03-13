@@ -66,11 +66,10 @@ var (
 
 // NewMysql
 // Note: better use NewMysqlPool instead
-func NewMysql(app *aa.App, cfgSection string) (string, *sql.DB, error) {
-	f, err := ParseMysqlConfig(app, cfgSection)
-
+func NewMysql(app *aa.App, section string) (string, *sql.DB, *ae.Error) {
+	f, err := ParseMysqlConfig(app, section)
 	if err != nil {
-		return "", nil, err
+		return "", nil, newConfigError(section, err)
 	}
 	ct := f.ConnectTimeout.Seconds()
 	rt := f.ReadTimeout.Seconds()
@@ -83,9 +82,8 @@ func NewMysql(app *aa.App, cfgSection string) (string, *sql.DB, error) {
 	// 每次db.Query操作后, 都建议调用rows.Close(). 因为 db.Query() 会从数据库连接池中获取一个连接, 这个底层连接在结果集(rows)未关闭前会被标记为处于繁忙状态。当遍历读到最后一条记录时，会发生一个内部EOF错误，自动调用rows.Close(),但如果提前退出循环，rows不会关闭，连接不会回到连接池中，连接也不会关闭, 则此连接会一直被占用. 因此通常我们使用 defer rows.Close() 来确保数据库连接可以正确放回到连接池中; 不过阅读源码发现rows.Close()操作是幂等操作，即一个幂等操作的特点是其任意多次执行所产生的影响均与一次执行的影响相同, 所以即便对已关闭的rows再执行close()也没关系.
 	// 需要import 	_ "github.com/go-sql-driver/mysql"
 	conn, err := sql.Open("mysql", src)
-
 	if err != nil {
-		return "", conn, fmt.Errorf("mysql connection(%s) open error: %s", src, err)
+		return "", conn, NewMysqlError(err, fmt.Sprintf("open mysql: %s", src))
 	}
 
 	// It is rare to Close a db, as the db handle is meant to be long-lived and shared between many goroutines.
@@ -93,27 +91,26 @@ func NewMysql(app *aa.App, cfgSection string) (string, *sql.DB, error) {
 	conn.SetMaxOpenConns(f.Pool.MaxOpenConns) // 设置最大打开的连接数，默认值为0表示不限制
 	conn.SetConnMaxLifetime(f.Pool.ConnMaxLifetime)
 	conn.SetConnMaxIdleTime(f.Pool.ConnMaxIdleTime)
-
-	return f.Schema, conn, err
+	return f.Schema, conn, nil
 }
 
 // NewMysqlPool
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewMysqlPool(app *aa.App, cfgSection string) (string, *sql.DB, error) {
-	d, ok := mysqlClients.Load(cfgSection)
+func NewMysqlPool(app *aa.App, section string) (string, *sql.DB, *ae.Error) {
+	d, ok := mysqlClients.Load(section)
 	if ok {
 		clientData := d.(MysqlClientData)
 		if clientData.Client != nil {
 			return clientData.Schema, clientData.Client, nil
 		}
-		mysqlClients.Delete(cfgSection)
+		mysqlClients.Delete(section)
 	}
-	schema, db, err := NewMysql(app, cfgSection)
-	if err != nil {
-		return "", nil, err
+	schema, db, e := NewMysql(app, section)
+	if e != nil {
+		return "", nil, e
 	}
-	mysqlClients.LoadOrStore(cfgSection, MysqlClientData{
+	mysqlClients.LoadOrStore(section, MysqlClientData{
 		Schema: schema,
 		Client: db,
 	})
@@ -151,9 +148,6 @@ func CloseMysqlPool() {
 // }
 
 func ParseMysqlConfig(app *aa.App, section string) (MysqlOptions, error) {
-	if section == "" {
-		section = "mysql"
-	}
 	host, err := tryGetSectionCfg(app, "mysql", section, "host")
 	if err != nil {
 		return MysqlOptions{}, err
@@ -202,8 +196,7 @@ func ParseMysqlConfig(app *aa.App, section string) (MysqlOptions, error) {
 	return cf, nil
 }
 
-// NewSQLError 处理 SQL 错误
-func NewSQLError(err error, details ...any) *ae.Error {
+func NewMysqlError(err error, details ...any) *ae.Error {
 	if err == nil {
 		return nil
 	}

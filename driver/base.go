@@ -3,7 +3,9 @@ package driver
 import (
 	"context"
 	"github.com/aarioai/airis/aa"
+	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/pkg/afmt"
+	"github.com/aarioai/airis/pkg/types"
 	"strings"
 	"sync"
 	"time"
@@ -49,11 +51,13 @@ func ParseTimeouts(t string, defaultTimeouts ...time.Duration) (conn time.Durati
 			}
 		}
 	}
-
 	return
 }
 
 func tryGetSectionCfg(app *aa.App, base, section string, key string, defaultValue ...string) (string, error) {
+	if section == "" {
+		section = base
+	}
 	k := section + "." + key
 	v, err := app.Config.MustGetString(k)
 	defaultV := afmt.First(defaultValue)
@@ -110,4 +114,27 @@ func CloseAllPools(ctx context.Context) {
 	}()
 
 	wg.Wait()
+}
+
+func newConfigError(section string, err error) *ae.Error {
+	return ae.NewE("config section [%s] error: %s", section, err.Error())
+}
+
+func parseStrings(s, separator string) []string {
+	if s == "" {
+		return nil
+	}
+	s = strings.ReplaceAll(s, " ", "")
+	return strings.Split(s, separator)
+}
+func parseUint16s(s, separator string) []uint16 {
+	arr := parseStrings(s, separator)
+	if len(arr) == 0 {
+		return nil
+	}
+	ret := make([]uint16, len(arr))
+	for i, v := range arr {
+		ret[i] = types.ToUint16(v)
+	}
+	return ret
 }

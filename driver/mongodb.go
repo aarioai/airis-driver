@@ -95,10 +95,10 @@ var (
 
 // NewMongodb
 // Note: better use NewMongodbPool instead
-func NewMongodb(app *aa.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
-	o, err := ParseMongodbConfig(app, cfgSection)
+func NewMongodb(app *aa.App, section string) (*mongo.Client, string, *ae.Error) {
+	o, err := ParseMongodbConfig(app, section)
 	if err != nil {
-		return nil, "", NewMongodbError(err, "parse mongodb config section: "+cfgSection)
+		return nil, "", newConfigError(section, err)
 	}
 	opts := o.ClientOptions()
 	var client *mongo.Client
@@ -111,20 +111,20 @@ func NewMongodb(app *aa.App, cfgSection string) (*mongo.Client, string, *ae.Erro
 // NewMongodbPool mongodb 自带连接池
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
-func NewMongodbPool(app *aa.App, cfgSection string) (*mongo.Client, string, *ae.Error) {
-	d, ok := mongodbClients.Load(cfgSection)
+func NewMongodbPool(app *aa.App, section string) (*mongo.Client, string, *ae.Error) {
+	d, ok := mongodbClients.Load(section)
 	if ok {
 		clientData := d.(MongodbClientData)
 		if clientData.Client != nil {
 			return clientData.Client, clientData.DB, nil
 		}
-		mongodbClients.Delete(cfgSection)
+		mongodbClients.Delete(section)
 	}
-	client, db, e := NewMongodb(app, cfgSection)
+	client, db, e := NewMongodb(app, section)
 	if e != nil {
 		return nil, "", e
 	}
-	mongodbClients.LoadOrStore(cfgSection, MongodbClientData{
+	mongodbClients.LoadOrStore(section, MongodbClientData{
 		Client: client,
 		DB:     db,
 	})
