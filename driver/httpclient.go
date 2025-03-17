@@ -12,6 +12,18 @@ import (
 	"time"
 )
 
+const (
+	DefaultHttpTimeout             = 30 * time.Second
+	DefaultHttpDialTimeout         = 10 * time.Second
+	DefaultHttpKeepAlive           = 15 * time.Second
+	DefaultHttpIdleConnTimeout     = 90 * time.Second
+	DefaultHttpTLSHandshakeTimeout = 10 * time.Second
+)
+
+var (
+	ErrInvalidHttpCertConfig = errors.New("invalid certificate configuration: format should be: <certFile>,<keyFile>[;<certFile>,<keyFile>...]")
+)
+
 type HttpClientConfig struct {
 	// http.Client
 	Timeout time.Duration `json:"timeout"`
@@ -103,6 +115,7 @@ func (c HttpClientConfig) TLSClientConfig() (*tls.Config, error) {
 		return nil, err
 	}
 	return &tls.Config{
+		Certificates:                   certs,
 		NextProtos:                     c.TLSNextProtos,
 		ServerName:                     c.TLSServerName,
 		ClientAuth:                     c.TLSClientAuth,
@@ -115,7 +128,6 @@ func (c HttpClientConfig) TLSClientConfig() (*tls.Config, error) {
 		DynamicRecordSizingDisabled:    c.TLSDynamicRecordSizingDisabled,
 		Renegotiation:                  c.TLSRenegotiation,
 		EncryptedClientHelloConfigList: c.TLSEncryptedClientHelloConfigList,
-		Certificates:                   certs,
 	}, nil
 }
 
@@ -128,6 +140,15 @@ func (c HttpClientConfig) Transport() (*http.Transport, error) {
 		DialContext:         c.Dialer().DialContext,
 		TLSHandshakeTimeout: c.TLSHandshakeTimeout,
 		TLSClientConfig:     tlsConfig,
+		DisableKeepAlives:   c.DisableKeepAlives,
+		DisableCompression:  c.DisableCompression,
+		MaxIdleConns:        c.MaxIdleConns,
+		MaxIdleConnsPerHost: c.MaxIdleConnsPerHost,
+		MaxConnsPerHost:     c.MaxConnsPerHost,
+		IdleConnTimeout:     c.IdleConnTimeout,
+		ForceAttemptHTTP2:   c.ForceAttemptHTTP2,
+		WriteBufferSize:     c.WriteBufferSize,
+		ReadBufferSize:      c.ReadBufferSize,
 	}, nil
 }
 
@@ -136,10 +157,12 @@ func NewHttpClient(app *aa.App, section string) (*http.Client, *ae.Error) {
 	if err != nil {
 		return nil, newConfigError(section, err)
 	}
+
 	transport, err := c.Transport()
 	if err != nil {
 		return nil, newConfigError(section, err)
 	}
+
 	return &http.Client{
 		Transport:     transport,
 		CheckRedirect: nil,
@@ -222,18 +245,18 @@ func ParseHttpClientConfig(app *aa.App, section string) (HttpClientConfig, error
 				continue
 			}
 			if len(pair) != 2 {
-				return HttpClientConfig{}, errors.New("tls_certificate_file_pairs invalid. config format should be: <certFile>,<keyFile>[;<certFile>,<keyFile>...]")
+				return HttpClientConfig{}, ErrInvalidHttpCertConfig
 			}
 			tlsCertFilePairs = append(tlsCertFilePairs, [2]string{pair[0], pair[1]})
 		}
 	}
 
 	return HttpClientConfig{
-		Timeout:                           types.ParseDuration(timeout),
-		DialTimeout:                       types.ParseDuration(dialTimeout),
+		Timeout:                           types.ParseDuration(timeout, DefaultHttpTimeout),
+		DialTimeout:                       types.ParseDuration(dialTimeout, DefaultHttpDialTimeout),
 		DialDualStack:                     types.ToBool(dialDualStack),
 		DialFallbackDelay:                 types.ParseDuration(dialFallbackDelay),
-		DialKeepAlive:                     types.ParseDuration(dialKeepAlive),
+		DialKeepAlive:                     types.ParseDuration(dialKeepAlive, DefaultHttpKeepAlive),
 		DialKeepAliveEnable:               types.ToBool(dialKeepAliveEnable),
 		DialKeepAliveIdle:                 types.ParseDuration(dialKeepAliveIdle),
 		DialKeepAliveInterval:             types.ParseDuration(dialKeepAliveInterval),
@@ -243,14 +266,14 @@ func ParseHttpClientConfig(app *aa.App, section string) (HttpClientConfig, error
 		MaxIdleConns:                      maxIdleConnsN,
 		MaxIdleConnsPerHost:               maxIdleConnsPerHostN,
 		MaxConnsPerHost:                   maxConnsPerHostN,
-		IdleConnTimeout:                   types.ParseDuration(idleConnTimeout),
+		IdleConnTimeout:                   types.ParseDuration(idleConnTimeout, DefaultHttpIdleConnTimeout),
 		ResponseHeaderTimeout:             types.ParseDuration(responseHeaderTimeout),
 		ExpectContinueTimeout:             types.ParseDuration(expectContinueTimeout),
 		MaxResponseHeaderBytes:            maxResponseHeaderBytesN,
 		WriteBufferSize:                   writeBufferSizeN,
 		ReadBufferSize:                    readBufferSizeN,
 		ForceAttemptHTTP2:                 types.ToBool(forceAttemptHTTP2),
-		TLSHandshakeTimeout:               types.ParseDuration(tlsHandshakeTimeout),
+		TLSHandshakeTimeout:               types.ParseDuration(tlsHandshakeTimeout, DefaultHttpTLSHandshakeTimeout),
 		TLSNextProtos:                     parseStrings(tlsNextProtos, ","),
 		TLSServerName:                     tlsServerName,
 		TLSClientAuth:                     tls.ClientAuthType(tlsClientAuthN),
