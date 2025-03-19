@@ -170,6 +170,14 @@ func (m *Model) InsertOne(ctx context.Context, t EntityInterface) (*mongo.Insert
 	return InsertOne(ctx, db, t)
 }
 
+func (m *Model) InsertMany(ctx context.Context, ts []EntityInterface) (*mongo.InsertManyResult, *ae.Error) {
+	_, db, e := m.DB()
+	if e != nil {
+		return nil, e
+	}
+	return InsertMany(ctx, db, ts)
+}
+
 func (m *Model) ReplaceOne(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
