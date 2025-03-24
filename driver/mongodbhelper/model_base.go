@@ -93,7 +93,11 @@ func EstimatedDocumentCount(ctx context.Context, db *mongo.Database, t EntityInt
 
 func FindOneRaw(ctx context.Context, db *mongo.Database, t EntityInterface, filter any, opts ...options.Lister[options.FindOneOptions]) (*mongo.SingleResult, *ae.Error) {
 	coll := db.Collection(t.Table())
-	return coll.FindOne(ctx, filter, opts...), nil
+	result := coll.FindOne(ctx, filter, opts...)
+	if result.Err() != nil {
+		return nil, driver.NewMongodbError(result.Err())
+	}
+	return result, nil
 }
 
 func FindOne(ctx context.Context, result any, db *mongo.Database, t EntityInterface, filter any, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
@@ -103,7 +107,7 @@ func FindOne(ctx context.Context, result any, db *mongo.Database, t EntityInterf
 	}
 	err := r.Decode(result)
 	if err != nil {
-		return ae.NewE("decode error: " + err.Error())
+		return driver.NewMongodbError(err)
 	}
 	return nil
 }
