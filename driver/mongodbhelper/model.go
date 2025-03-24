@@ -42,7 +42,7 @@ func (m *Model) CreateIndexes(ctx context.Context, t index.Entity) *ae.Error {
 	return CreateIndexes(ctx, db, t)
 }
 
-func (m *Model) AggregateRaw(ctx context.Context, t EntityInterface, pipeline interface{}, opts ...options.Lister[options.AggregateOptions]) (*mongo.Cursor, *ae.Error) {
+func (m *Model) AggregateRaw(ctx context.Context, t EntityInterface, pipeline any, opts ...options.Lister[options.AggregateOptions]) (*mongo.Cursor, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -50,7 +50,7 @@ func (m *Model) AggregateRaw(ctx context.Context, t EntityInterface, pipeline in
 	return AggregateRaw(ctx, db, t, pipeline, opts...)
 }
 
-func (m *Model) Aggregate(ctx context.Context, results interface{}, t EntityInterface, pipeline interface{}, opts ...options.Lister[options.AggregateOptions]) *ae.Error {
+func (m *Model) Aggregate(ctx context.Context, results any, t EntityInterface, pipeline any, opts ...options.Lister[options.AggregateOptions]) *ae.Error {
 	_, db, e := m.DB()
 	if e != nil {
 		return e
@@ -58,7 +58,7 @@ func (m *Model) Aggregate(ctx context.Context, results interface{}, t EntityInte
 	return Aggregate(ctx, results, db, t, pipeline, opts...)
 }
 
-func (m *Model) CountDocuments(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.CountOptions]) (int64, *ae.Error) {
+func (m *Model) CountDocuments(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.CountOptions]) (int64, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return 0, e
@@ -66,7 +66,7 @@ func (m *Model) CountDocuments(ctx context.Context, t EntityInterface, filter in
 	return CountDocuments(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) DeleteOne(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, *ae.Error) {
+func (m *Model) DeleteOne(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -74,7 +74,7 @@ func (m *Model) DeleteOne(ctx context.Context, t EntityInterface, filter interfa
 	return DeleteOne(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) DeleteMany(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.DeleteManyOptions]) (*mongo.DeleteResult, *ae.Error) {
+func (m *Model) DeleteMany(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.DeleteManyOptions]) (*mongo.DeleteResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -82,7 +82,7 @@ func (m *Model) DeleteMany(ctx context.Context, t EntityInterface, filter interf
 	return DeleteMany(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) Distinct(ctx context.Context, t EntityInterface, field string, filter interface{}, opts ...options.Lister[options.DistinctOptions]) (*mongo.DistinctResult, *ae.Error) {
+func (m *Model) Distinct(ctx context.Context, t EntityInterface, field string, filter any, opts ...options.Lister[options.DistinctOptions]) (*mongo.DistinctResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -106,7 +106,7 @@ func (m *Model) EstimatedDocumentCount(ctx context.Context, t EntityInterface, o
 	return EstimatedDocumentCount(ctx, db, t, opts...)
 }
 
-func (m *Model) FindOneRaw(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOneOptions]) (*mongo.SingleResult, *ae.Error) {
+func (m *Model) FindOneRaw(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.FindOneOptions]) (*mongo.SingleResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -114,7 +114,7 @@ func (m *Model) FindOneRaw(ctx context.Context, t EntityInterface, filter interf
 	return FindOneRaw(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) FindOne(ctx context.Context, result interface{}, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
+func (m *Model) FindOne(ctx context.Context, result any, t EntityInterface, filter any, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
 	_, db, e := m.DB()
 	if e != nil {
 		return e
@@ -122,7 +122,7 @@ func (m *Model) FindOne(ctx context.Context, result interface{}, t EntityInterfa
 	return FindOne(ctx, result, db, t, filter, opts...)
 }
 
-func (m *Model) FindRaw(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
+func (m *Model) FindRaw(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -130,7 +130,7 @@ func (m *Model) FindRaw(ctx context.Context, t EntityInterface, filter interface
 	return FindRaw(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) Find(ctx context.Context, results interface{}, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOptions]) *ae.Error {
+func (m *Model) Find(ctx context.Context, results any, t EntityInterface, filter any, opts ...options.Lister[options.FindOptions]) *ae.Error {
 	_, db, e := m.DB()
 	if e != nil {
 		return e
@@ -138,7 +138,7 @@ func (m *Model) Find(ctx context.Context, results interface{}, t EntityInterface
 	return Find(ctx, results, db, t, filter, opts...)
 }
 
-func (m *Model) FindOneAndDelete(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.FindOneAndDeleteOptions]) (*mongo.SingleResult, *ae.Error) {
+func (m *Model) FindOneAndDelete(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.FindOneAndDeleteOptions]) (*mongo.SingleResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -146,7 +146,7 @@ func (m *Model) FindOneAndDelete(ctx context.Context, t EntityInterface, filter 
 	return FindOneAndDelete(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) FindOneAndReplace(ctx context.Context, t EntityInterface, filter, replace interface{}, opts ...options.Lister[options.FindOneAndReplaceOptions]) (*mongo.SingleResult, *ae.Error) {
+func (m *Model) FindOneAndReplace(ctx context.Context, t EntityInterface, filter, replace any, opts ...options.Lister[options.FindOneAndReplaceOptions]) (*mongo.SingleResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -154,7 +154,7 @@ func (m *Model) FindOneAndReplace(ctx context.Context, t EntityInterface, filter
 	return FindOneAndReplace(ctx, db, t, filter, replace, opts...)
 }
 
-func (m *Model) FindOneAndUpdate(ctx context.Context, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.FindOneAndUpdateOptions]) (*mongo.SingleResult, *ae.Error) {
+func (m *Model) FindOneAndUpdate(ctx context.Context, t EntityInterface, filter any, update bson.D, opts ...options.Lister[options.FindOneAndUpdateOptions]) (*mongo.SingleResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -178,7 +178,7 @@ func (m *Model) InsertMany(ctx context.Context, ts []EntityInterface) (*mongo.In
 	return InsertMany(ctx, db, ts)
 }
 
-func (m *Model) ReplaceOne(ctx context.Context, t EntityInterface, filter interface{}, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (m *Model) ReplaceOne(ctx context.Context, t EntityInterface, filter any, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -186,7 +186,7 @@ func (m *Model) ReplaceOne(ctx context.Context, t EntityInterface, filter interf
 	return ReplaceOne(ctx, db, t, filter, opts...)
 }
 
-func (m *Model) UpdateOne(ctx context.Context, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (m *Model) UpdateOne(ctx context.Context, t EntityInterface, filter any, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -198,7 +198,7 @@ func (m *Model) UpdateByObjectId(ctx context.Context, t EntityInterface, id stri
 	return m.UpdateOne(ctx, t, bson.D{{"_id", id}}, update, opts...)
 }
 
-func (m *Model) UpdateMany(ctx context.Context, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (m *Model) UpdateMany(ctx context.Context, t EntityInterface, filter any, update bson.D, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -207,7 +207,7 @@ func (m *Model) UpdateMany(ctx context.Context, t EntityInterface, filter interf
 }
 
 // UpsertOne update or insert one
-func (m *Model) UpsertOne(ctx context.Context, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (m *Model) UpsertOne(ctx context.Context, t EntityInterface, filter any, update bson.D, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e
@@ -216,7 +216,7 @@ func (m *Model) UpsertOne(ctx context.Context, t EntityInterface, filter interfa
 }
 
 // UpsertMany update or insert many
-func (m *Model) UpsertMany(ctx context.Context, t EntityInterface, filter interface{}, update bson.D, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (m *Model) UpsertMany(ctx context.Context, t EntityInterface, filter any, update bson.D, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	_, db, e := m.DB()
 	if e != nil {
 		return nil, e

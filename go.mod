@@ -3,11 +3,11 @@ module github.com/aarioai/airis-driver
 go 1.23.6
 
 require (
-	github.com/aarioai/airis v0.1.157
-	github.com/go-sql-driver/mysql v1.9.0
+	github.com/aarioai/airis v0.1.158
+	github.com/go-sql-driver/mysql v1.9.1
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/rabbitmq/amqp091-go v1.10.0
-	github.com/redis/go-redis/v9 v9.7.1
+	github.com/redis/go-redis/v9 v9.7.3
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.mongodb.org/mongo-driver/v2 v2.1.0
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
@@ -48,7 +48,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
-	github.com/tdewolff/minify/v2 v2.22.2 // indirect
+	github.com/tdewolff/minify/v2 v2.22.3 // indirect
 	github.com/tdewolff/parse/v2 v2.7.21 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
