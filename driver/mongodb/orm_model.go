@@ -121,7 +121,7 @@ func (o *ORMS) FindOneAndUpdate(ctx context.Context, opts ...options.Lister[opti
 	return FindOneAndUpdate(ctx, o.db, o.entity, o.filter, o.update, opts...)
 }
 
-func (o *ORMS) InsertOne(ctx context.Context, opts ...options.Lister[options.InsertOneOptions]) (*mongo.InsertOneResult, *ae.Error) {
+func (o *ORMS) Insert(ctx context.Context, opts ...options.Lister[options.InsertOneOptions]) (*mongo.InsertOneResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
