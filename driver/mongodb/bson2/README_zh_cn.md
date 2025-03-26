@@ -1,4 +1,10 @@
 # Mongodb 说明文档
+
+* bson.E    {Key, Value}
+* bson.D    有序 []bson.E
+* bson.M    无序 map[string]any  => map[string]bson.D or map[string]bson.M
+* bson.A    []any =>  bson.A{"apple", 18, bson.M{}, bson.E{}, bson.D{}}
+
 ## Session
 * startSession
 * endSession
@@ -8,13 +14,15 @@
 * killAllSessionsByPattern
 
 ## Query
-* 比较查询
-  * $eq $gt $gte $lt $lte $ne
-  * $in 字段是否在指定数组中
+* 比较查询 **COMPARE**
+  * \$eq \$gt \$gte \$lt \$lte \$ne        `bson.M{ <key>: bson.M{"$eq":<value>} }`  等价于 `bson.M{<key>:<value>}`
+  * \$in 字段是否在指定数组中                `bson.M{<key>: bson.M{"$exists": true, "$nin": bson.A{<value>, <value>}}}`
   * $nin not in
-* 逻辑查询 $and $or $not $nor
-* 元素查询
-  * $exists
+* 逻辑查询 **LOGICAL**
+  * $and $or $nor                        `bson.M{"$nor": bson.A{bson.M{<key>: <value>}...}}`
+  * $not                                 `bson.M{"$not": {COMPARE}}`
+* 元素查询 **ELEMENT**
+  * $exists         某个字段是否存在 `bson.M{<key>: bson.M{"$exists": true, "$nin": bson.A{<value>, <value>}}}`
   * $type double|string|object|array|binData|undefined|objectId|bool|date|null|regex|javascript|int|timestamp|long
     |decimal|minKey|maxKey
 * 评估查询
@@ -36,11 +44,11 @@
   * $minDistance
   * $polygon
 * 数组查询
-  * $all           匹配包含查询中指定的所有元素的数组
+  * $all           匹配包含查询中指定的所有元素的数组  `All("scores", 10, 20, 30)`  ==>  `scores.contains([10,20,30])`, [1,10,20,21,30] True, [20,30] False
   * $elemMatch     如果数组字段中的元素与所有指定的 $elemMatch 条件均匹配，则选择文档
-  * $size          如果数组字段达到指定大小，则选择文档
+  * $size          如果数组字段达到指定大小，则选择文档 `{"scores":{$size, 2}`  ==> 匹配scores有且只有2个元素
 * 按位查询
-  * $bitsAllClear  匹配数字或二进制值，其中一组片段位置均包含值0
+  * $bitsAllClear  匹配数字或二进制值，其中一组片段位置均包含值0  `{"scores":{$bitsAllClear:[0,2]}}` 匹配（从后往前）第0和第2位为0
   * $bitsAllSet    匹配数字或二进制值，其中一组片段位置均包含值1
   * $bitsAnyClear  匹配数字或二进制值，其中一组位位置中的任何 位的值为 0
   * $bitsAnySet    匹配数字或二进制值，其中一组位位置中的任何 位的值为 1
