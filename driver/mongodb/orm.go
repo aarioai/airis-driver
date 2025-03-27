@@ -5,6 +5,7 @@ import (
 	"github.com/aarioai/airis-driver/driver/mongodb/bson2"
 	"github.com/aarioai/airis-driver/driver/mongodb/bson3"
 	"github.com/aarioai/airis/aa/ae"
+	"github.com/aarioai/airis/aa/atype"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
@@ -198,4 +199,14 @@ func (o *ORMS) Limit(offset, limit int64) *ORMS {
 	o.offset = offset
 	o.limit = limit
 	return o
+}
+
+func (o *ORMS) LimitN(offset, limit int) *ORMS {
+	o.offset = int64(offset)
+	o.limit = int64(limit)
+	return o
+}
+
+func (o *ORMS) Paging(paging atype.Paging) *ORMS {
+	return o.LimitN(paging.Offset, paging.Limit)
 }
