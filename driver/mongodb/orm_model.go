@@ -34,28 +34,28 @@ func (o *ORMS) CountDocuments(ctx context.Context, opts ...options.Lister[option
 	if o.error != nil {
 		return 0, o.error
 	}
-	return CountDocuments(ctx, o.db, o.entity, o.filter, opts...)
+	return CountDocuments(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) DeleteOne(ctx context.Context, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return DeleteOne(ctx, o.db, o.entity, o.filter, opts...)
+	return DeleteOne(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) DeleteMany(ctx context.Context, opts ...options.Lister[options.DeleteManyOptions]) (*mongo.DeleteResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return DeleteMany(ctx, o.db, o.entity, o.filter, opts...)
+	return DeleteMany(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) Distinct(ctx context.Context, field string, opts ...options.Lister[options.DistinctOptions]) (*mongo.DistinctResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return Distinct(ctx, o.db, o.entity, field, o.filter, opts...)
+	return Distinct(ctx, o.db, o.entity, field, o.Filter(), opts...)
 }
 
 func (o *ORMS) Drop(ctx context.Context, opts ...options.Lister[options.DropCollectionOptions]) *ae.Error {
@@ -76,49 +76,49 @@ func (o *ORMS) FindOneRaw(ctx context.Context, opts ...options.Lister[options.Fi
 	if o.error != nil {
 		return nil, o.error
 	}
-	return FindOneRaw(ctx, o.db, o.entity, o.filter, opts...)
+	return FindOneRaw(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) FindOne(ctx context.Context, result any, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
-	return FindOne(ctx, result, o.db, o.entity, o.filter, opts...)
+	return FindOne(ctx, result, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) FindRaw(ctx context.Context, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return FindRaw(ctx, o.db, o.entity, o.filter, opts...)
+	return FindRaw(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) Find(ctx context.Context, result any, opts ...options.Lister[options.FindOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
-	return Find(ctx, result, o.db, o.entity, o.filter, opts...)
+	return Find(ctx, result, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) FindOneAndDelete(ctx context.Context, opts ...options.Lister[options.FindOneAndDeleteOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return FindOneAndDelete(ctx, o.db, o.entity, o.filter, opts...)
+	return FindOneAndDelete(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) FindOneAndReplace(ctx context.Context, opts ...options.Lister[options.FindOneAndReplaceOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return FindOneAndReplace(ctx, o.db, o.entity, o.filter, opts...)
+	return FindOneAndReplace(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) FindOneAndUpdate(ctx context.Context, opts ...options.Lister[options.FindOneAndUpdateOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return FindOneAndUpdate(ctx, o.db, o.entity, o.filter, o.update, opts...)
+	return FindOneAndUpdate(ctx, o.db, o.entity, o.Filter(), o.update, opts...)
 }
 
 func (o *ORMS) Insert(ctx context.Context, opts ...options.Lister[options.InsertOneOptions]) (*mongo.InsertOneResult, *ae.Error) {
@@ -139,35 +139,35 @@ func (o *ORMS) ReplaceOne(ctx context.Context, opts ...options.Lister[options.Re
 	if o.error != nil {
 		return nil, o.error
 	}
-	return ReplaceOne(ctx, o.db, o.entity, o.filter, opts...)
+	return ReplaceOne(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) UpdateOne(ctx context.Context, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return UpdateOne(ctx, o.db, o.entity, o.filter, update, opts...)
+	return UpdateOne(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
 func (o *ORMS) UpdateMany(ctx context.Context, update any, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return UpdateMany(ctx, o.db, o.entity, o.filter, update, opts...)
+	return UpdateMany(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
 func (o *ORMS) UpsertOne(ctx context.Context, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return UpsertOne(ctx, o.db, o.entity, o.filter, update, opts...)
+	return UpsertOne(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
 func (o *ORMS) UpsertMany(ctx context.Context, update any, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
-	return UpsertMany(ctx, o.db, o.entity, o.filter, update, opts...)
+	return UpsertMany(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
 func (o *ORMS) InsertOrUpdate(ctx context.Context, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {

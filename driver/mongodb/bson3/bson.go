@@ -25,10 +25,22 @@ var (
 
 // C compare
 // E.g. C("a", ">=", 100), C("a", "$gte", 100)
+// operator:
+// = > >= < <= != $eq $gt $gte $lt $lte $ne
+// & | ^
+// $type
+// $in $nin $all $size $elemMatch $addToSet $pop $pull $push $pushAll $each $position $slice $sort
 func C(field, operator string, value any) bson.M {
+	// = > >= < <= != $eq $gt $gte $lt $lte $ne
 	if v, ok := compareOperators[operator]; ok {
-		operator = v
+		return bson.M{field: bson.M{operator: v}}
 	}
+	for k, v := range bitOperators {
+		if k == operator || v == operator {
+			return Bit(field, v, value.(int))
+		}
+	}
+
 	return bson.M{field: bson.M{operator: value}}
 }
 
@@ -43,24 +55,6 @@ func Nin(field string, values ...any) bson.M {
 
 func NotMatch(field string, pattern string, opts ...string) bson.M {
 	return bson.M{field: bson2.NotMatch(pattern, opts...)}
-}
-
-// And
-// E.g. And(bson.M{sex:"f"}, C("age", "<=", 18))   ==>  sex="f" AND age<=18
-func And(field string, values ...any) bson.M {
-	return bson.M{field: bson2.And(values...)}
-}
-
-// Or
-// E.g. Or(bson.M{sex:"f"}, C("age", "!=", 18))  ==>  sex="f" OR age!=18
-func Or(field string, values ...any) bson.M {
-	return bson.M{field: bson2.Or(values...)}
-}
-
-// Nor not or, not match any of these
-// E.g.Nor(bson.M{sex:"f"}, C("age", "<=", 18))  ==>  !(sex="f" OR age<=18)  ==>  sex!="f" AND age>18
-func Nor(field string, values ...any) bson.M {
-	return bson.M{field: bson2.Nor(values...)}
 }
 
 func Exists(field string) bson.M {

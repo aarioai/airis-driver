@@ -20,21 +20,6 @@ func NotMatch(pattern string, opts ...string) bson.M {
 	return bson.M{"$not": re}
 }
 
-// And
-// E.g. And(In("a", 10, 20, 30), bson.M{"status": 0}, C("x", "!=", 300))
-func And(values ...any) bson.M {
-	return bson.M{"$and": A(values...)}
-}
-
-func Or(values ...any) bson.M {
-	return bson.M{"$or": A(values...)}
-}
-
-// Nor not or, not match any of these
-func Nor(values ...any) bson.M {
-	return bson.M{"$nor": A(values...)}
-}
-
 func Exists() bson.M {
 	return bson.M{"$exists": true}
 }
