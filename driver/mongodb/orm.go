@@ -27,6 +27,8 @@ type ORMS struct {
 	update     any
 	baseFilter any
 	filters    []filter
+	sort       bson.D
+	comment    any
 	error      *ae.Error
 }
 
@@ -39,6 +41,7 @@ func ORM(db *mongo.Database, entity index.Entity) *ORMS {
 		db:      db,
 		entity:  entity,
 		filters: make([]filter, 0),
+		sort:    make(bson.D, 0),
 	}
 }
 
@@ -159,5 +162,34 @@ func (o *ORMS) OrExists(field string) *ORMS {
 func (o *ORMS) NotExists(field string) *ORMS {
 	value := bson3.NotExists(field)
 	o.filters = append(o.filters, filter{or, value})
+	return o
+}
+
+// OrderBy
+// asc [DESC]|ASC
+func (o *ORMS) OrderBy(field string, asc ...string) *ORMS {
+	value := -1
+	if len(asc) > 0 && asc[0] == "ASC" {
+		value = 1
+	}
+	o.sort = append(o.sort, bson.E{Key: field, Value: value})
+	return o
+}
+
+// Sort
+// E.g. Sort("id", "DESC", "age", "ASC")
+func (o *ORMS) Sort(pairs ...string) *ORMS {
+	for i := 0; i < len(pairs); i += 2 {
+		value := -1
+		if pairs[i+1] == "ASC" {
+			value = 1
+		}
+		o.sort = append(o.sort, bson.E{Key: pairs[i], Value: value})
+	}
+	return o
+}
+
+func (o *ORMS) WithComment(comment any) *ORMS {
+	o.comment = comment
 	return o
 }

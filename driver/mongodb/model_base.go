@@ -209,9 +209,6 @@ func UpdateMany(ctx context.Context, db *mongo.Database, t index.Entity, filter 
 }
 
 func UpsertOne(ctx context.Context, db *mongo.Database, t index.Entity, filter any, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
-	if len(opts) == 0 {
-		opts = make([]options.Lister[options.UpdateOneOptions], 0, 1)
-	}
 	opts = append(opts, options.UpdateOne().SetUpsert(true))
 	return UpdateOne(ctx, db, t, filter, update, opts...)
 }
