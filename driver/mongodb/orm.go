@@ -28,7 +28,8 @@ type ORMS struct {
 	baseFilter any
 	filters    []filter
 	sort       bson.D
-	comment    any
+	offset     int64
+	limit      int64
 	error      *ae.Error
 }
 
@@ -193,7 +194,8 @@ func (o *ORMS) Sort(sort ...bson.E) *ORMS {
 	return o
 }
 
-func (o *ORMS) WithComment(comment any) *ORMS {
-	o.comment = comment
+func (o *ORMS) Limit(offset, limit int64) *ORMS {
+	o.offset = offset
+	o.limit = limit
 	return o
 }
