@@ -1,11 +1,13 @@
 package mongodb
 
 import (
+	"context"
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis-driver/driver/index"
 	"github.com/aarioai/airis/aa"
 	"github.com/aarioai/airis/aa/ae"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 	"time"
 )
 
@@ -25,6 +27,14 @@ func (m *Model) DB() (*mongo.Client, *mongo.Database, *ae.Error) {
 		return nil, nil, e
 	}
 	return client, client.Database(db), nil
+}
+
+func (m *Model) InsertMany(ctx context.Context, ts []index.Entity, opts ...options.Lister[options.InsertManyOptions]) (*mongo.InsertManyResult, *ae.Error) {
+	_, db, e := m.DB()
+	if e != nil {
+		return nil, e
+	}
+	return InsertMany(ctx, db, ts, opts...)
 }
 
 func (m *Model) ORM(t index.Entity) *ORMS {

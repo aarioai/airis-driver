@@ -2,7 +2,6 @@ package mongodb
 
 import (
 	"context"
-	"github.com/aarioai/airis-driver/driver/index"
 	"github.com/aarioai/airis/aa/ae"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
@@ -126,13 +125,6 @@ func (o *ORMS) Insert(ctx context.Context, opts ...options.Lister[options.Insert
 		return nil, o.error
 	}
 	return InsertOne(ctx, o.db, o.entity, opts...)
-}
-
-func (o *ORMS) InsertMany(ctx context.Context, ts []index.Entity, opts ...options.Lister[options.InsertManyOptions]) (*mongo.InsertManyResult, *ae.Error) {
-	if o.error != nil {
-		return nil, o.error
-	}
-	return InsertMany(ctx, o.db, ts, opts...)
 }
 
 func (o *ORMS) ReplaceOne(ctx context.Context, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
