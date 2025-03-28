@@ -118,20 +118,20 @@ func (o *ORMS) findOptions(opts ...options.Lister[options.FindOptions]) []option
 	return append(opts, opt)
 }
 
-func (o *ORMS) FindRaw(ctx context.Context, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
+func (o *ORMS) FindManyRaw(ctx context.Context, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	opts = o.findOptions(opts...)
-	return FindRaw(ctx, o.db, o.entity, o.Filter(), opts...)
+	return FindManyRaw(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) Find(ctx context.Context, result any, opts ...options.Lister[options.FindOptions]) *ae.Error {
+func (o *ORMS) FindMany(ctx context.Context, result any, opts ...options.Lister[options.FindOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
 	opts = o.findOptions(opts...)
-	return Find(ctx, result, o.db, o.entity, o.Filter(), opts...)
+	return FindMany(ctx, result, o.db, o.entity, o.Filter(), opts...)
 }
 
 func (o *ORMS) findOneAndDeleteOptions(opts ...options.Lister[options.FindOneAndDeleteOptions]) []options.Lister[options.FindOneAndDeleteOptions] {

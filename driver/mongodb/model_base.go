@@ -112,7 +112,7 @@ func FindOne(ctx context.Context, result any, db *mongo.Database, t index.Entity
 	return nil
 }
 
-func FindRaw(ctx context.Context, db *mongo.Database, t index.Entity, filter any, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
+func FindManyRaw(ctx context.Context, db *mongo.Database, t index.Entity, filter any, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
 	coll := db.Collection(t.Table())
 	cursor, err := coll.Find(ctx, filter, opts...)
 	if err != nil {
@@ -125,8 +125,8 @@ func FindRaw(ctx context.Context, db *mongo.Database, t index.Entity, filter any
 	return cursor, nil
 }
 
-func Find(ctx context.Context, results any, db *mongo.Database, t index.Entity, filter any, opts ...options.Lister[options.FindOptions]) *ae.Error {
-	cursor, e := FindRaw(ctx, db, t, filter, opts...)
+func FindMany(ctx context.Context, results any, db *mongo.Database, t index.Entity, filter any, opts ...options.Lister[options.FindOptions]) *ae.Error {
+	cursor, e := FindManyRaw(ctx, db, t, filter, opts...)
 	if e != nil {
 		return e
 	}
