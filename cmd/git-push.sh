@@ -69,8 +69,9 @@ fi
 
 
 handleUpdateMod(){
-    local today=$(date +%Y-%m-%d)
     local latest_update=''
+    local today
+    today="$(date +"%Y-%m-%d")"
     if [ -s "${MOD_UPDATE_FILE}" ]; then
         latest_update=$(cat "${MOD_UPDATE_FILE}")
     fi
@@ -79,9 +80,14 @@ handleUpdateMod(){
         return 0
     fi
 
-    info "go test -u -v ./..."
-    go get -u -v ./...
-    printf '%s' "$today" > "${MOD_UPDATE_FILE}"
+    info "go get -u -v ./..."
+    if ! go get -u -v ./... >/dev/null 2>&1; then
+        warn "update go modules failed"
+    fi
+    sudo chmod a+rw "$MOD_UPDATE_FILE"
+    info "save update mod date to $MOD_UPDATE_FILE"
+    printf '%s' "$today" > "$MOD_UPDATE_FILE"
+    cat "$MOD_UPDATE_FILE"
 }
 
 pushAndUpgradeMod() {

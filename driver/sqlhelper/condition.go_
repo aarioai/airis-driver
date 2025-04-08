@@ -64,7 +64,7 @@ func name(u any, ele string) string {
 	for j := 0; j < t.NumField(); j++ {
 		f := t.Field(j)
 		if f.Name == ele {
-			return f.Tag.Get("name")
+			return f.Tag.Get("db")
 		}
 	}
 	return ele
