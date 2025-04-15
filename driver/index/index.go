@@ -15,7 +15,7 @@ type IndexColumn struct {
 }
 type Indexes map[string][]IndexColumn
 type Entity interface {
-	Table(...any) string
+	Table() string
 	Indexes() Indexes
 }
 

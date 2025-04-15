@@ -97,6 +97,8 @@ pushAndUpgradeMod() {
 
     handleUpdateMod
 
+    info "go mod tidy"
+    [ -f "go.mod" ] || go mod init
     go mod tidy || panic "failed go mod tidy"
 
     info "go test ./..."
