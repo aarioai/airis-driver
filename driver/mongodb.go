@@ -124,11 +124,13 @@ func NewMongodbPool(app *aa.App, section string) (*mongo.Client, string, *ae.Err
 	if e != nil {
 		return nil, "", e
 	}
-	mongodbClients.LoadOrStore(section, MongodbClientData{
+	d = MongodbClientData{
 		Client: client,
 		DB:     db,
-	})
-	return client, db, nil
+	}
+	d, _ = mongodbClients.LoadOrStore(section, d)
+	clientData := d.(MongodbClientData)
+	return clientData.Client, clientData.DB, nil
 }
 
 // CloseMongodbPool

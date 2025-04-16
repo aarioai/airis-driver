@@ -154,7 +154,7 @@ func NewInfluxdbPool(app *aa.App, section string, defaultTags map[string]string)
 	query := client.QueryAPI(org)
 	write := client.WriteAPI(org, bucket)
 	writeBlocking := client.WriteAPIBlocking(org, bucket)
-	result := InfluxdbClientData{
+	d = InfluxdbClientData{
 		Client:               client,
 		DefaultOrg:           org,
 		DefaultBucket:        bucket,
@@ -162,8 +162,8 @@ func NewInfluxdbPool(app *aa.App, section string, defaultTags map[string]string)
 		DefaultWrite:         write,
 		DefaultWriteBlocking: writeBlocking,
 	}
-	influxdbClients.LoadOrStore(section, result)
-	return result, nil
+	d, _ = influxdbClients.LoadOrStore(section, d)
+	return d.(InfluxdbClientData), nil
 }
 
 // CloseInfluxdbPool

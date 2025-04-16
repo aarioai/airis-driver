@@ -32,20 +32,20 @@ func NewRedis(app *aa.App, section string) (*redis.Client, *ae.Error) {
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
 func NewRedisPool(app *aa.App, section string) (*redis.Client, *ae.Error) {
-	cli, ok := redisClients.Load(section)
+	client, ok := redisClients.Load(section)
 	if ok {
-		if cli != nil {
-			return cli.(*redis.Client), nil
+		if client != nil {
+			return client.(*redis.Client), nil
 		}
 		redisClients.Delete(section)
 	}
-
-	client, e := NewRedis(app, section)
+	var e *ae.Error
+	client, e = NewRedis(app, section)
 	if e != nil {
 		return nil, e
 	}
-	redisClients.LoadOrStore(section, client)
-	return client, nil
+	client, _ = redisClients.LoadOrStore(section, client)
+	return client.(*redis.Client), nil
 }
 
 // CloseRedisPool

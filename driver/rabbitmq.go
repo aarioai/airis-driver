@@ -56,19 +56,20 @@ func NewRabbitmq(app *aa.App, section string, tlsConfig *tls.Config, sasl []amqp
 // Warning: Do not unset the returned client as it is managed by the pool
 // Warning: 使用完不要unset client，释放是错误人为操作，可能会导致其他正在使用该client的线程panic，这里不做过度处理。
 func NewRabbitmqPool(app *aa.App, section string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) (*rabbitmq.Conn, *ae.Error) {
-	cli, ok := rabbitmqClients.Load(section)
+	client, ok := rabbitmqClients.Load(section)
 	if ok {
-		if cli != nil {
-			return cli.(*rabbitmq.Conn), nil
+		if client != nil {
+			return client.(*rabbitmq.Conn), nil
 		}
 		rabbitmqClients.Delete(section)
 	}
-	client, err := NewRabbitmq(app, section, tlsConfig, sasl, opts)
-	if err != nil {
-		return nil, err
+	var e *ae.Error
+	client, e = NewRabbitmq(app, section, tlsConfig, sasl, opts)
+	if e != nil {
+		return nil, e
 	}
-	rabbitmqClients.Store(section, client)
-	return client, nil
+	client, _ = rabbitmqClients.LoadOrStore(section, client)
+	return client.(*rabbitmq.Conn), nil
 }
 
 // CloseRabbitmqPool
