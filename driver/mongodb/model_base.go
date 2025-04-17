@@ -118,7 +118,7 @@ func FindManyRaw(ctx context.Context, db *mongo.Database, t index.Entity, filter
 	if err != nil {
 		e := driver.NewMongodbError(err)
 		if e != nil && e.IsNotFound() {
-			e = ae.ErrorNoRows
+			e = ae.ErrorNoRowsAvailable
 		}
 		return nil, e
 	}
@@ -134,7 +134,7 @@ func FindMany(ctx context.Context, results any, db *mongo.Database, t index.Enti
 	err := cursor.All(ctx, results)
 	e = driver.NewMongodbError(err)
 	if (e != nil && e.IsNotFound()) || reflect.ValueOf(results).Elem().Len() == 0 {
-		e = ae.ErrorNoRows
+		e = ae.ErrorNoRowsAvailable
 	}
 	return e
 }

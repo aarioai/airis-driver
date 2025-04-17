@@ -158,8 +158,8 @@ func (d *DB) ScanX(ctx context.Context, query string, id string, dest ...any) *a
 	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 
+// Query
 // do not forget to close *sql.Rows
-// 不要忘了关闭 rows
 // 只有 QueryRow 找不到才会返回 ae.ErrorNotFound；Query 即使不存在，也是 nil
 func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *ae.Error) {
 	if d.error != nil {
@@ -171,7 +171,7 @@ func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 			alog.LogOnError(rows.Close())
 		}
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ae.ErrorNoRows
+			return nil, ae.ErrorNoRowsAvailable
 		}
 		return nil, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 	}

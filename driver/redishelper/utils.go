@@ -17,7 +17,7 @@ func Uint64s(vs []string, err error) ([]uint64, *ae.Error) {
 		return nil, driver.NewRedisError(err)
 	}
 	if len(vs) == 0 {
-		return nil, ae.ErrorNoRows
+		return nil, ae.ErrorNoRowsAvailable
 	}
 	ids := make([]uint64, len(vs))
 	for i, v := range vs {

@@ -165,7 +165,7 @@ func (t *Tx) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 			alog.LogOnError(rows.Close())
 		}
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ae.ErrorNoRows
+			return nil, ae.ErrorNoRowsAvailable
 		}
 		return nil, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
 	}
