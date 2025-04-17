@@ -75,7 +75,7 @@ func NewMysql(app *aa.App, section string) (string, *sql.DB, *ae.Error) {
 	rt := f.ReadTimeout.Seconds()
 	wt := f.WriteTimeout.Seconds()
 	src := fmt.Sprintf("%s:%s@tcp(%s)/%s?timeout=%.1fs&readTimeout=%.1fs&writeTimeout=%.1fs", f.User, f.Password, f.Host, f.Schema, ct, rt, wt)
-	alog.Console("connect mysql: %s@%s %s", f.User, f.Host, f.Schema)
+	alog.Log("connect mysql: %s@%s %s", f.User, f.Host, f.Schema)
 	// sql.Open并不会立即建立一个数据库的网络连接, 也不会对数据库链接参数的合法性做检验, 它仅仅是初始化一个sql.DB对象. 当真正进行第一次数据库查询操作时, 此时才会真正建立网络连接;
 	// sql.Open返回的sql.DB对象是协程并发安全的.
 	// sql.DB表示操作数据库的抽象接口的对象，但不是所谓的数据库连接对象，sql.DB对象只有当需要使用时才会创建连接，如果想立即验证连接，需要用Ping()方法;
