@@ -22,7 +22,7 @@ type filter struct {
 	value     any
 }
 
-type ORMs struct {
+type ORMS struct {
 	db         *mongo.Database
 	entity     index.Entity
 	update     any
@@ -34,12 +34,12 @@ type ORMs struct {
 	error      *ae.Error
 }
 
-func ErrorORM(e *ae.Error) *ORMs {
-	return &ORMs{error: e}
+func ErrorORM(e *ae.Error) *ORMS {
+	return &ORMS{error: e}
 }
 
-func ORM(db *mongo.Database, entity index.Entity) *ORMs {
-	return &ORMs{
+func ORM(db *mongo.Database, entity index.Entity) *ORMS {
+	return &ORMS{
 		db:      db,
 		entity:  entity,
 		filters: make([]filter, 0),
@@ -68,14 +68,14 @@ func parseFilter(args ...any) any {
 	panic("parseFilter: invalid arguments")
 }
 
-func (o *ORMs) WithError(e *ae.Error) *ORMs {
+func (o *ORMS) WithError(e *ae.Error) *ORMS {
 	if o.error == nil {
 		o.error = e
 	}
 	return o
 }
 
-func (o *ORMs) Filter() any {
+func (o *ORMS) Filter() any {
 	if len(o.filters) == 0 {
 		return o.baseFilter
 	}
@@ -114,72 +114,72 @@ func (o *ORMs) Filter() any {
 	return bson2.And(result...)
 }
 
-func (o *ORMs) Where(args ...any) *ORMs {
+func (o *ORMS) Where(args ...any) *ORMS {
 	o.baseFilter = parseFilter(args...)
 	return o
 }
 
-func (o *ORMs) WhereExists(field string) *ORMs {
+func (o *ORMS) WhereExists(field string) *ORMS {
 	o.baseFilter = bson3.Exists(field)
 	return o
 }
 
-func (o *ORMs) WhereNotExists(field string) *ORMs {
+func (o *ORMS) WhereNotExists(field string) *ORMS {
 	o.baseFilter = bson3.NotExists(field)
 	return o
 }
 
 // And
 // E.g. Where("a",100).And("b", "nin" bson.A{10,20,30}).And("c", "$all", bson.A{1,2,3})
-func (o *ORMs) And(args ...any) *ORMs {
+func (o *ORMS) And(args ...any) *ORMS {
 	value := parseFilter(args...)
 	o.filters = append(o.filters, filter{and, value})
 	return o
 }
 
-func (o *ORMs) AndExists(field string) *ORMs {
+func (o *ORMS) AndExists(field string) *ORMS {
 	value := bson3.Exists(field)
 	o.filters = append(o.filters, filter{and, value})
 	return o
 }
 
-func (o *ORMs) AndNotExists(field string) *ORMs {
+func (o *ORMS) AndNotExists(field string) *ORMS {
 	value := bson3.NotExists(field)
 	o.filters = append(o.filters, filter{and, value})
 	return o
 }
 
-func (o *ORMs) Or(args ...any) *ORMs {
+func (o *ORMS) Or(args ...any) *ORMS {
 	value := parseFilter(args...)
 	o.filters = append(o.filters, filter{or, value})
 	return o
 }
 
-func (o *ORMs) OrExists(field string) *ORMs {
+func (o *ORMS) OrExists(field string) *ORMS {
 	value := bson3.Exists(field)
 	o.filters = append(o.filters, filter{or, value})
 	return o
 }
 
-func (o *ORMs) NotExists(field string) *ORMs {
+func (o *ORMS) NotExists(field string) *ORMS {
 	value := bson3.NotExists(field)
 	o.filters = append(o.filters, filter{or, value})
 	return o
 }
 
-func (o *ORMs) DescBy(field string) *ORMs {
+func (o *ORMS) DescBy(field string) *ORMS {
 	o.sort = append(o.sort, bson.E{Key: field, Value: -1})
 	return o
 }
 
-func (o *ORMs) AscBy(field string) *ORMs {
+func (o *ORMS) AscBy(field string) *ORMS {
 	o.sort = append(o.sort, bson.E{Key: field, Value: 1})
 	return o
 }
 
 // OrderBy
 // E.g. OrderBy("id", "DESC", "age", "ASC")
-func (o *ORMs) OrderBy(pairs ...string) *ORMs {
+func (o *ORMS) OrderBy(pairs ...string) *ORMS {
 	for i := 0; i < len(pairs); i += 2 {
 		value := -1
 		if pairs[i+1] == "ASC" {
@@ -190,23 +190,23 @@ func (o *ORMs) OrderBy(pairs ...string) *ORMs {
 	return o
 }
 
-func (o *ORMs) Sort(sort ...bson.E) *ORMs {
+func (o *ORMS) Sort(sort ...bson.E) *ORMS {
 	o.sort = append(o.sort, sort...)
 	return o
 }
 
-func (o *ORMs) Limit(offset, limit int64) *ORMs {
+func (o *ORMS) Limit(offset, limit int64) *ORMS {
 	o.offset = offset
 	o.limit = limit
 	return o
 }
 
-func (o *ORMs) LimitN(offset, limit int) *ORMs {
+func (o *ORMS) LimitN(offset, limit int) *ORMS {
 	o.offset = int64(offset)
 	o.limit = int64(limit)
 	return o
 }
 
-func (o *ORMs) Paging(paging atype.Paging) *ORMs {
+func (o *ORMS) Paging(paging atype.Paging) *ORMS {
 	return o.LimitN(paging.Offset, paging.Limit)
 }

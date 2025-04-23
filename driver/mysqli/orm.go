@@ -8,26 +8,26 @@ import (
 	"strings"
 )
 
-type ORMs struct {
+type ORMS struct {
 	db *DB
 	t  index.Entity
 }
 
-func ORM(db *DB, t index.Entity) *ORMs {
-	return &ORMs{db, t}
+func ORM(db *DB, t index.Entity) *ORMS {
+	return &ORMS{db, t}
 }
 
-func (d *ORMs) DeleteMany(ctx context.Context, field string, value any) *ae.Error {
+func (d *ORMS) DeleteMany(ctx context.Context, field string, value any) *ae.Error {
 	qs := fmt.Sprintf("DELETE FROM `%s` WHERE `%s`=?", d.t.Table(), field)
 	return d.db.Exec(ctx, qs, value)
 }
 
-func (d *ORMs) DeleteOne(ctx context.Context, field string, value any) *ae.Error {
+func (d *ORMS) DeleteOne(ctx context.Context, field string, value any) *ae.Error {
 	qs := fmt.Sprintf("DELETE FROM `%s` WHERE `%s`=? LIMIT 1", d.t.Table(), field)
 	return d.db.Exec(ctx, qs, value)
 }
 
-func (d *ORMs) DeletePK(ctx context.Context, id any) *ae.Error {
+func (d *ORMS) DeletePK(ctx context.Context, id any) *ae.Error {
 	primary, e := d.t.Indexes().PrimaryKey()
 	if e != nil {
 		return e
@@ -35,7 +35,7 @@ func (d *ORMs) DeletePK(ctx context.Context, id any) *ae.Error {
 	return d.DeleteOne(ctx, primary, id)
 }
 
-func (d *ORMs) ExistsOne(ctx context.Context, field string, value any) *ae.Error {
+func (d *ORMS) ExistsOne(ctx context.Context, field string, value any) *ae.Error {
 	qs := fmt.Sprintf("SELECT 1 FROM `%s` WHERE `%s`=? LIMIT 1", d.t.Table(), field)
 	var newId uint8
 	e := d.db.ScanAny(ctx, qs, value, &newId)
@@ -48,7 +48,7 @@ func (d *ORMs) ExistsOne(ctx context.Context, field string, value any) *ae.Error
 	return ae.ErrorNotFound
 }
 
-func (d *ORMs) ExistsPK(ctx context.Context, id any) *ae.Error {
+func (d *ORMS) ExistsPK(ctx context.Context, id any) *ae.Error {
 	primary, e := d.t.Indexes().PrimaryKey()
 	if e != nil {
 		return e
@@ -56,7 +56,7 @@ func (d *ORMs) ExistsPK(ctx context.Context, id any) *ae.Error {
 	return d.ExistsOne(ctx, primary, id)
 }
 
-func (d *ORMs) AlterMany(ctx context.Context, field string, value any, data map[string]any) *ae.Error {
+func (d *ORMS) AlterMany(ctx context.Context, field string, value any, data map[string]any) *ae.Error {
 	if len(data) == 0 {
 		return ae.ErrorInputTooShort
 	}
@@ -78,7 +78,7 @@ func (d *ORMs) AlterMany(ctx context.Context, field string, value any, data map[
 	return d.db.Exec(ctx, qs, args...)
 }
 
-func (d *ORMs) AlterOne(ctx context.Context, field string, value any, data map[string]any) *ae.Error {
+func (d *ORMS) AlterOne(ctx context.Context, field string, value any, data map[string]any) *ae.Error {
 	if len(data) == 0 {
 		return ae.ErrorInputTooShort
 	}
@@ -100,7 +100,7 @@ func (d *ORMs) AlterOne(ctx context.Context, field string, value any, data map[s
 	return d.db.Exec(ctx, qs, args...)
 }
 
-func (d *ORMs) Alter(ctx context.Context, id any, data map[string]any) *ae.Error {
+func (d *ORMS) Alter(ctx context.Context, id any, data map[string]any) *ae.Error {
 	primary, e := d.t.Indexes().PrimaryKey()
 	if e != nil {
 		return e
@@ -108,7 +108,7 @@ func (d *ORMs) Alter(ctx context.Context, id any, data map[string]any) *ae.Error
 	return d.AlterOne(ctx, primary, id, data)
 }
 
-func (d *ORMs) Find(ctx context.Context, id any, dst map[string]any) *ae.Error {
+func (d *ORMS) Find(ctx context.Context, id any, dst map[string]any) *ae.Error {
 	var fields strings.Builder
 	dest := make([]any, 0, len(dst))
 	for k, v := range dst {
