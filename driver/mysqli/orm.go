@@ -17,6 +17,10 @@ func ORM(db *DB, t index.Entity) *ORMS {
 	return &ORMS{db, t}
 }
 
+func (d *DB) ORM(t index.Entity) *ORMS {
+	return &ORMS{d, t}
+}
+
 func (d *ORMS) DeleteMany(ctx context.Context, field string, value any) *ae.Error {
 	qs := fmt.Sprintf("DELETE FROM `%s` WHERE `%s`=?", d.t.Table(), field)
 	return d.db.Exec(ctx, qs, value)
