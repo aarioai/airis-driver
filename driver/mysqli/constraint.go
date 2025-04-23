@@ -1,4 +1,4 @@
-package mysql
+package mysqli
 
 import (
 	"github.com/aarioai/airis/aa/atype"

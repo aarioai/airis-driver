@@ -1,7 +1,7 @@
-package mysql_test
+package mysqli_test
 
 import (
-	"github.com/aarioai/airis-driver/driver/mysql"
+	"github.com/aarioai/airis-driver/driver/mysqli"
 	"testing"
 )
 
@@ -15,14 +15,14 @@ func TestAnd(t *testing.T) {
 		Name: "Aario",
 		Age:  18,
 	}
-	s := mysql.And(u, "name", "age")
+	s := mysqli.And(u, "name", "age")
 	s1 := "`age`=\"18\" AND `name`=\"Aario\""
 	s2 := "`name`=\"Aario\" AND `age`=\"18\""
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.And(u, true, ...) == %s", s)
 	}
 
-	s = mysql.And(u, "Name", "Age")
+	s = mysqli.And(u, "Name", "Age")
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.And(u, false, ...) == %s", s)
 	}
@@ -33,14 +33,14 @@ func TestOr(t *testing.T) {
 		Name: "Aario",
 		Age:  18,
 	}
-	s := mysql.Or(u, "name", "age")
+	s := mysqli.Or(u, "name", "age")
 	s1 := "`age`=\"18\" OR `name`=\"Aario\""
 	s2 := "`name`=\"Aario\" OR `age`=\"18\""
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.Or(u, true, ...) == %s", s)
 	}
 
-	s = mysql.Or(u, "Name", "Age")
+	s = mysqli.Or(u, "Name", "Age")
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.Or(u, false, ...) == %s", s)
 	}
@@ -51,14 +51,14 @@ func TestAndWithWhere(t *testing.T) {
 		Name: "Aario",
 		Age:  18,
 	}
-	s := mysql.AndWithWhere(u, "name", "age")
+	s := mysqli.AndWithWhere(u, "name", "age")
 	s1 := " WHERE `age`=\"18\" AND `name`=\"Aario\" "
 	s2 := " WHERE `name`=\"Aario\" AND `age`=\"18\" "
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.Or(u, true, ...) == %s", s)
 	}
 
-	s = mysql.AndWithWhere(u, "Name", "Age")
+	s = mysqli.AndWithWhere(u, "Name", "Age")
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.Or(u, false, ...) == %s", s)
 	}
@@ -69,14 +69,14 @@ func TestOrWithWhere(t *testing.T) {
 		Name: "Aario",
 		Age:  18,
 	}
-	s := mysql.OrWithWhere(u, "name", "age")
+	s := mysqli.OrWithWhere(u, "name", "age")
 	s1 := " WHERE `age`=\"18\" OR `name`=\"Aario\" "
 	s2 := " WHERE `name`=\"Aario\" OR `age`=\"18\" "
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.Or(u, true, ...) == %s", s)
 	}
 
-	s = mysql.OrWithWhere(u, "Name", "Age")
+	s = mysqli.OrWithWhere(u, "Name", "Age")
 	if s != s1 && s != s2 {
 		t.Errorf("sqlhelper.Or(u, false, ...) == %s", s)
 	}
