@@ -7,14 +7,14 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-func (o *ORMS) CreateIndexes(ctx context.Context) *ae.Error {
+func (o *ORMs) CreateIndexes(ctx context.Context) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
 	return CreateIndexes(ctx, o.db, o.entity)
 }
 
-func (o *ORMS) AggregateRaw(ctx context.Context, pipeline any, opts ...options.Lister[options.AggregateOptions]) (
+func (o *ORMs) AggregateRaw(ctx context.Context, pipeline any, opts ...options.Lister[options.AggregateOptions]) (
 	*mongo.Cursor, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
@@ -22,56 +22,56 @@ func (o *ORMS) AggregateRaw(ctx context.Context, pipeline any, opts ...options.L
 	return AggregateRaw(ctx, o.db, o.entity, pipeline, opts...)
 }
 
-func (o *ORMS) Aggregate(ctx context.Context, results any, pipeline any, opts ...options.Lister[options.AggregateOptions]) *ae.Error {
+func (o *ORMs) Aggregate(ctx context.Context, results any, pipeline any, opts ...options.Lister[options.AggregateOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
 	return Aggregate(ctx, results, o.db, o.entity, pipeline, opts...)
 }
 
-func (o *ORMS) CountDocuments(ctx context.Context, opts ...options.Lister[options.CountOptions]) (int64, *ae.Error) {
+func (o *ORMs) CountDocuments(ctx context.Context, opts ...options.Lister[options.CountOptions]) (int64, *ae.Error) {
 	if o.error != nil {
 		return 0, o.error
 	}
 	return CountDocuments(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) DeleteOne(ctx context.Context, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, *ae.Error) {
+func (o *ORMs) DeleteOne(ctx context.Context, opts ...options.Lister[options.DeleteOneOptions]) (*mongo.DeleteResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	return DeleteOne(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) DeleteMany(ctx context.Context, opts ...options.Lister[options.DeleteManyOptions]) (*mongo.DeleteResult, *ae.Error) {
+func (o *ORMs) DeleteMany(ctx context.Context, opts ...options.Lister[options.DeleteManyOptions]) (*mongo.DeleteResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	return DeleteMany(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) Distinct(ctx context.Context, field string, opts ...options.Lister[options.DistinctOptions]) (*mongo.DistinctResult, *ae.Error) {
+func (o *ORMs) Distinct(ctx context.Context, field string, opts ...options.Lister[options.DistinctOptions]) (*mongo.DistinctResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	return Distinct(ctx, o.db, o.entity, field, o.Filter(), opts...)
 }
 
-func (o *ORMS) Drop(ctx context.Context, opts ...options.Lister[options.DropCollectionOptions]) *ae.Error {
+func (o *ORMs) Drop(ctx context.Context, opts ...options.Lister[options.DropCollectionOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
 	return Drop(ctx, o.db, o.entity, opts...)
 }
 
-func (o *ORMS) EstimatedDocumentCount(ctx context.Context, opts ...options.Lister[options.EstimatedDocumentCountOptions]) (int64, *ae.Error) {
+func (o *ORMs) EstimatedDocumentCount(ctx context.Context, opts ...options.Lister[options.EstimatedDocumentCountOptions]) (int64, *ae.Error) {
 	if o.error != nil {
 		return 0, o.error
 	}
 	return EstimatedDocumentCount(ctx, o.db, o.entity, opts...)
 }
 
-func (o *ORMS) findOneOptions(opts ...options.Lister[options.FindOneOptions]) []options.Lister[options.FindOneOptions] {
+func (o *ORMs) findOneOptions(opts ...options.Lister[options.FindOneOptions]) []options.Lister[options.FindOneOptions] {
 	if len(o.sort) == 0 && o.offset == 0 {
 		return opts
 	}
@@ -85,7 +85,7 @@ func (o *ORMS) findOneOptions(opts ...options.Lister[options.FindOneOptions]) []
 	return append(opts, opt)
 }
 
-func (o *ORMS) FindOneRaw(ctx context.Context, opts ...options.Lister[options.FindOneOptions]) (*mongo.SingleResult, *ae.Error) {
+func (o *ORMs) FindOneRaw(ctx context.Context, opts ...options.Lister[options.FindOneOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -93,7 +93,7 @@ func (o *ORMS) FindOneRaw(ctx context.Context, opts ...options.Lister[options.Fi
 	return FindOneRaw(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) FindOne(ctx context.Context, result any, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
+func (o *ORMs) FindOne(ctx context.Context, result any, opts ...options.Lister[options.FindOneOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
@@ -101,7 +101,7 @@ func (o *ORMS) FindOne(ctx context.Context, result any, opts ...options.Lister[o
 	return FindOne(ctx, result, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) findOptions(opts ...options.Lister[options.FindOptions]) []options.Lister[options.FindOptions] {
+func (o *ORMs) findOptions(opts ...options.Lister[options.FindOptions]) []options.Lister[options.FindOptions] {
 	if len(o.sort) == 0 && o.offset == 0 && o.limit == 0 {
 		return opts
 	}
@@ -118,7 +118,7 @@ func (o *ORMS) findOptions(opts ...options.Lister[options.FindOptions]) []option
 	return append(opts, opt)
 }
 
-func (o *ORMS) FindManyRaw(ctx context.Context, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
+func (o *ORMs) FindManyRaw(ctx context.Context, opts ...options.Lister[options.FindOptions]) (*mongo.Cursor, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -126,7 +126,7 @@ func (o *ORMS) FindManyRaw(ctx context.Context, opts ...options.Lister[options.F
 	return FindManyRaw(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) FindMany(ctx context.Context, result any, opts ...options.Lister[options.FindOptions]) *ae.Error {
+func (o *ORMs) FindMany(ctx context.Context, result any, opts ...options.Lister[options.FindOptions]) *ae.Error {
 	if o.error != nil {
 		return o.error
 	}
@@ -134,7 +134,7 @@ func (o *ORMS) FindMany(ctx context.Context, result any, opts ...options.Lister[
 	return FindMany(ctx, result, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) findOneAndDeleteOptions(opts ...options.Lister[options.FindOneAndDeleteOptions]) []options.Lister[options.FindOneAndDeleteOptions] {
+func (o *ORMs) findOneAndDeleteOptions(opts ...options.Lister[options.FindOneAndDeleteOptions]) []options.Lister[options.FindOneAndDeleteOptions] {
 	if len(o.sort) == 0 {
 		return opts
 	}
@@ -145,7 +145,7 @@ func (o *ORMS) findOneAndDeleteOptions(opts ...options.Lister[options.FindOneAnd
 	return append(opts, opt)
 }
 
-func (o *ORMS) FindOneAndDelete(ctx context.Context, opts ...options.Lister[options.FindOneAndDeleteOptions]) (*mongo.SingleResult, *ae.Error) {
+func (o *ORMs) FindOneAndDelete(ctx context.Context, opts ...options.Lister[options.FindOneAndDeleteOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -153,7 +153,7 @@ func (o *ORMS) FindOneAndDelete(ctx context.Context, opts ...options.Lister[opti
 	return FindOneAndDelete(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) findOneAndReplaceOptions(opts ...options.Lister[options.FindOneAndReplaceOptions]) []options.Lister[options.FindOneAndReplaceOptions] {
+func (o *ORMs) findOneAndReplaceOptions(opts ...options.Lister[options.FindOneAndReplaceOptions]) []options.Lister[options.FindOneAndReplaceOptions] {
 	if len(o.sort) == 0 {
 		return opts
 	}
@@ -164,7 +164,7 @@ func (o *ORMS) findOneAndReplaceOptions(opts ...options.Lister[options.FindOneAn
 	return append(opts, opt)
 }
 
-func (o *ORMS) FindOneAndReplace(ctx context.Context, opts ...options.Lister[options.FindOneAndReplaceOptions]) (*mongo.SingleResult, *ae.Error) {
+func (o *ORMs) FindOneAndReplace(ctx context.Context, opts ...options.Lister[options.FindOneAndReplaceOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -172,7 +172,7 @@ func (o *ORMS) FindOneAndReplace(ctx context.Context, opts ...options.Lister[opt
 	return FindOneAndReplace(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) findOneAndUpdateOptions(opts ...options.Lister[options.FindOneAndUpdateOptions]) []options.Lister[options.FindOneAndUpdateOptions] {
+func (o *ORMs) findOneAndUpdateOptions(opts ...options.Lister[options.FindOneAndUpdateOptions]) []options.Lister[options.FindOneAndUpdateOptions] {
 	if len(o.sort) == 0 {
 		return opts
 	}
@@ -183,7 +183,7 @@ func (o *ORMS) findOneAndUpdateOptions(opts ...options.Lister[options.FindOneAnd
 	return append(opts, opt)
 }
 
-func (o *ORMS) FindOneAndUpdate(ctx context.Context, opts ...options.Lister[options.FindOneAndUpdateOptions]) (*mongo.SingleResult, *ae.Error) {
+func (o *ORMs) FindOneAndUpdate(ctx context.Context, opts ...options.Lister[options.FindOneAndUpdateOptions]) (*mongo.SingleResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -191,14 +191,14 @@ func (o *ORMS) FindOneAndUpdate(ctx context.Context, opts ...options.Lister[opti
 	return FindOneAndUpdate(ctx, o.db, o.entity, o.Filter(), o.update, opts...)
 }
 
-func (o *ORMS) Insert(ctx context.Context, opts ...options.Lister[options.InsertOneOptions]) (*mongo.InsertOneResult, *ae.Error) {
+func (o *ORMs) Insert(ctx context.Context, opts ...options.Lister[options.InsertOneOptions]) (*mongo.InsertOneResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	return InsertOne(ctx, o.db, o.entity, opts...)
 }
 
-func (o *ORMS) replaceOptions(opts ...options.Lister[options.ReplaceOptions]) []options.Lister[options.ReplaceOptions] {
+func (o *ORMs) replaceOptions(opts ...options.Lister[options.ReplaceOptions]) []options.Lister[options.ReplaceOptions] {
 	if len(o.sort) == 0 {
 		return opts
 	}
@@ -209,7 +209,7 @@ func (o *ORMS) replaceOptions(opts ...options.Lister[options.ReplaceOptions]) []
 	return append(opts, opt)
 }
 
-func (o *ORMS) ReplaceOne(ctx context.Context, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (o *ORMs) ReplaceOne(ctx context.Context, opts ...options.Lister[options.ReplaceOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -217,7 +217,7 @@ func (o *ORMS) ReplaceOne(ctx context.Context, opts ...options.Lister[options.Re
 	return ReplaceOne(ctx, o.db, o.entity, o.Filter(), opts...)
 }
 
-func (o *ORMS) updateOneOptions(opts ...options.Lister[options.UpdateOneOptions]) []options.Lister[options.UpdateOneOptions] {
+func (o *ORMs) updateOneOptions(opts ...options.Lister[options.UpdateOneOptions]) []options.Lister[options.UpdateOneOptions] {
 	if len(o.sort) == 0 {
 		return opts
 	}
@@ -228,7 +228,7 @@ func (o *ORMS) updateOneOptions(opts ...options.Lister[options.UpdateOneOptions]
 	return append(opts, opt)
 }
 
-func (o *ORMS) UpdateOne(ctx context.Context, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (o *ORMs) UpdateOne(ctx context.Context, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -236,14 +236,14 @@ func (o *ORMS) UpdateOne(ctx context.Context, update any, opts ...options.Lister
 	return UpdateOne(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
-func (o *ORMS) UpdateMany(ctx context.Context, update any, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (o *ORMs) UpdateMany(ctx context.Context, update any, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	return UpdateMany(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
-func (o *ORMS) UpsertOne(ctx context.Context, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (o *ORMs) UpsertOne(ctx context.Context, update any, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
@@ -251,14 +251,14 @@ func (o *ORMS) UpsertOne(ctx context.Context, update any, opts ...options.Lister
 	return UpsertOne(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
-func (o *ORMS) UpsertMany(ctx context.Context, update any, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (o *ORMs) UpsertMany(ctx context.Context, update any, opts ...options.Lister[options.UpdateManyOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}
 	return UpsertMany(ctx, o.db, o.entity, o.Filter(), update, opts...)
 }
 
-func (o *ORMS) InsertOrUpdate(ctx context.Context, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
+func (o *ORMs) InsertOrUpdate(ctx context.Context, opts ...options.Lister[options.UpdateOneOptions]) (*mongo.UpdateResult, *ae.Error) {
 	if o.error != nil {
 		return nil, o.error
 	}

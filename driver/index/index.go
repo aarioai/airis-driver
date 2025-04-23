@@ -1,8 +1,14 @@
 package index
 
 import (
+	"github.com/aarioai/airis/aa/ae"
 	"slices"
 	"strings"
+)
+
+var (
+	ErrMissingPKDefinition   = ae.New(ae.VariantAlsoNegotiates, "missing primary key definition").Lock()
+	ErrMultiplePKDefinitions = ae.New(ae.VariantAlsoNegotiates, "can have only one primary key. found multiple definitions").Lock()
 )
 
 type IndexType uint8
@@ -45,6 +51,7 @@ func index(t IndexType, fields ...string) []IndexColumn {
 	}
 	return indexes
 }
+
 func parseFieldNames(columns []IndexColumn) []string {
 	fields := make([]string, len(columns))
 	for i, column := range columns {
@@ -52,6 +59,7 @@ func parseFieldNames(columns []IndexColumn) []string {
 	}
 	return fields
 }
+
 func makeIndexName(t IndexType, columns []IndexColumn) string {
 	var s strings.Builder
 	switch t {
@@ -125,6 +133,17 @@ func (s Indexes) Primary(indexName ...string) []string {
 		return parseFieldNames(columns)
 	}
 	return nil
+}
+
+func (s Indexes) PrimaryKey(indexName ...string) (string, *ae.Error) {
+	primaries := s.Primary(indexName...)
+	if len(primaries) == 1 {
+		return primaries[0], nil
+	}
+	if len(primaries) == 0 {
+		return "", ErrMissingPKDefinition
+	}
+	return "", ErrMultiplePKDefinitions
 }
 
 // List all indexes of these types

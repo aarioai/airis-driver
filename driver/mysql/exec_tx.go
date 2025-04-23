@@ -1,4 +1,4 @@
-package sqlhelper
+package mysql
 
 import (
 	"context"
@@ -156,8 +156,17 @@ func (t *Tx) ScanX(ctx context.Context, query string, id string, dest ...any) *a
 	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
 }
 
+func (t *Tx) ScanAny(ctx context.Context, query string, id any, dest ...any) *ae.Error {
+	row, e := t.QueryRow(ctx, query, id)
+	if e != nil {
+		return e
+	}
+	return driver.NewMysqlError(row.Scan(dest...), fmt.Sprintf(query, id))
+}
+
+// Query returns a nil result when no rows are found.
+// QueryRow returns ae.ErrorNotFound if no rows match the query.
 // do not forget to close *sql.Rows
-// 不要忘了关闭 rows
 func (t *Tx) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *ae.Error) {
 	rows, err := t.Tx.QueryContext(ctx, query, args...)
 	if err != nil {

@@ -1,4 +1,4 @@
-package rabbitmqhelper
+package rabbitmq
 
 import "github.com/wagslane/go-rabbitmq"
 

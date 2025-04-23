@@ -1,4 +1,4 @@
-package emqxhelper
+package emqx
 
 import "github.com/aarioai/airis/aa/ae"
 

@@ -1,4 +1,4 @@
-package sqlhelper
+package mysql
 
 import (
 	"github.com/aarioai/airis/aa/atype"

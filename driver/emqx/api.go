@@ -1,4 +1,4 @@
-package emqxhelper
+package emqx
 
 import (
 	"bytes"

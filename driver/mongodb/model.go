@@ -37,7 +37,7 @@ func (m *Model) InsertMany(ctx context.Context, ts []index.Entity, opts ...optio
 	return InsertMany(ctx, db, ts, opts...)
 }
 
-func (m *Model) ORM(t index.Entity) *ORMS {
+func (m *Model) ORM(t index.Entity) *ORMs {
 	_, db, e := m.DB()
 	if e != nil {
 		return ErrorORM(e)
