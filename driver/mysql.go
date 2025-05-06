@@ -64,26 +64,34 @@ var (
 	mysqlClients sync.Map
 )
 
-// NewMysql
-// Note: better use NewMysqlPool instead
-func NewMysql(app *aa.App, section string) (string, *sql.DB, *ae.Error) {
+// NewMysqlDSN parse Mysql Data Source Name from configuration
+func NewMysqlDSN(app *aa.App, section string) (string, MysqlOptions, *ae.Error) {
 	f, err := ParseMysqlConfig(app, section)
 	if err != nil {
-		return "", nil, newConfigError(section, err)
+		return "", f, newConfigError(section, err)
 	}
 	ct := f.ConnectTimeout.Seconds()
 	rt := f.ReadTimeout.Seconds()
 	wt := f.WriteTimeout.Seconds()
-	src := fmt.Sprintf("%s:%s@tcp(%s)/%s?timeout=%.1fs&readTimeout=%.1fs&writeTimeout=%.1fs", f.User, f.Password, f.Host, f.Schema, ct, rt, wt)
 	alog.Log("connect mysql: %s@%s %s", f.User, f.Host, f.Schema)
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?timeout=%.1fs&readTimeout=%.1fs&writeTimeout=%.1fs", f.User, f.Password, f.Host, f.Schema, ct, rt, wt), f, nil
+}
+
+// NewMysql
+// Note: better use NewMysqlPool instead
+func NewMysql(app *aa.App, section string) (string, *sql.DB, *ae.Error) {
+	dsn, f, e := NewMysqlDSN(app, section)
+	if e != nil {
+		return "", nil, e
+	}
 	// sql.Open并不会立即建立一个数据库的网络连接, 也不会对数据库链接参数的合法性做检验, 它仅仅是初始化一个sql.DB对象. 当真正进行第一次数据库查询操作时, 此时才会真正建立网络连接;
 	// sql.Open返回的sql.DB对象是协程并发安全的.
 	// sql.DB表示操作数据库的抽象接口的对象，但不是所谓的数据库连接对象，sql.DB对象只有当需要使用时才会创建连接，如果想立即验证连接，需要用Ping()方法;
 	// 每次db.Query操作后, 都建议调用rows.Close(). 因为 db.Query() 会从数据库连接池中获取一个连接, 这个底层连接在结果集(rows)未关闭前会被标记为处于繁忙状态。当遍历读到最后一条记录时，会发生一个内部EOF错误，自动调用rows.Close(),但如果提前退出循环，rows不会关闭，连接不会回到连接池中，连接也不会关闭, 则此连接会一直被占用. 因此通常我们使用 defer rows.Close() 来确保数据库连接可以正确放回到连接池中; 不过阅读源码发现rows.Close()操作是幂等操作，即一个幂等操作的特点是其任意多次执行所产生的影响均与一次执行的影响相同, 所以即便对已关闭的rows再执行close()也没关系.
 	// 需要import 	_ "github.com/go-sql-driver/mysql"
-	conn, err := sql.Open("mysql", src)
+	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return "", conn, NewMysqlError(err, fmt.Sprintf("open mysql: %s", src))
+		return "", conn, NewMysqlError(err, fmt.Sprintf("open mysql: %s", dsn))
 	}
 
 	// It is rare to Close a db, as the db handle is meant to be long-lived and shared between many goroutines.
