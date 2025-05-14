@@ -201,7 +201,7 @@ func (o *ORMS) Limit(offset, limit int64) *ORMS {
 	return o
 }
 
-func (o *ORMS) LimitN(offset, limit int) *ORMS {
+func (o *ORMS) LimitN(offset uint, limit uint16) *ORMS {
 	o.offset = int64(offset)
 	o.limit = int64(limit)
 	return o
