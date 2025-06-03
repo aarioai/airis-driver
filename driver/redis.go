@@ -55,7 +55,7 @@ func CloseRedisPool() {
 	redisClients.Range(func(k, v interface{}) bool {
 		client := v.(*redis.Client)
 		if client != nil {
-			alog.Stop("redis client: %s", k)
+			alog.Stopf("redis client: %s", k)
 			return client.Close() == nil
 		}
 		return true

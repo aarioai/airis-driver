@@ -117,7 +117,7 @@ func CloseAllPools(ctx context.Context) {
 }
 
 func newConfigError(section string, err error) *ae.Error {
-	return ae.NewE("config section [%s] error: %s", section, err.Error())
+	return ae.NewF("config section [%s] error: %s", section, err.Error())
 }
 
 func parseStrings(s, separator string) []string {

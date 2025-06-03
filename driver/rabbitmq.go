@@ -79,7 +79,7 @@ func CloseRabbitmqPool() {
 	rabbitmqClients.Range(func(k, v interface{}) bool {
 		client := v.(*rabbitmq.Conn)
 		if client != nil {
-			alog.Stop("rabbitmq client: %s", k)
+			alog.Stopf("rabbitmq client: %s", k)
 			return client.Close() == nil
 		}
 		return true

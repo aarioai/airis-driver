@@ -174,7 +174,7 @@ func CloseInfluxdbPool() {
 		clientData := v.(InfluxdbClientData)
 		client := clientData.Client
 		if client != nil {
-			alog.Stop("influxdb client: %s", k)
+			alog.Stopf("influxdb client: %s", k)
 			client.Close()
 		}
 		return true

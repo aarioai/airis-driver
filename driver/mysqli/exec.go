@@ -8,7 +8,6 @@ import (
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/aa/alog"
-	"github.com/aarioai/airis/pkg/afmt"
 )
 
 type DB struct {
@@ -35,7 +34,7 @@ func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
 	stmt, err := d.DB.PrepareContext(ctx, query)
 	if err != nil {
 		if stmt != nil {
-			alog.LogOnError(stmt.Close())
+			alog.OnError(stmt.Close())
 		}
 		return nil, driver.NewMysqlError(err, query)
 	}
@@ -50,7 +49,7 @@ func (d *DB) Execute(ctx context.Context, query string, args ...any) (sql.Result
 		return nil, d.error
 	}
 	res, err := d.DB.ExecContext(ctx, query, args...)
-	return res, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
+	return res, driver.NewMysqlError(err, query)
 }
 
 func (d *DB) Exec(ctx context.Context, query string, args ...any) *ae.Error {
@@ -71,7 +70,7 @@ func (d *DB) Insert(ctx context.Context, query string, args ...any) (uint, *ae.E
 	}
 	// 由于事务是先执行，后回滚或提交，所以可以先获取插入的ID，后commit()
 	id, err := res.LastInsertId()
-	return uint(id), driver.NewMysqlError(err, afmt.Sprintf(query, args...))
+	return uint(id), driver.NewMysqlError(err, query)
 }
 
 func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.Error) {
@@ -84,7 +83,7 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 	}
 	// 由于事务是先执行，后回滚或提交，所以可以先获取更新结果，后commit()
 	id, err := res.RowsAffected()
-	return id, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
+	return id, driver.NewMysqlError(err, query)
 }
 
 // 批量查询
@@ -113,7 +112,7 @@ func (d *DB) QueryRow(ctx context.Context, query string, args ...any) (*sql.Row,
 		return nil, d.error
 	}
 	row := d.DB.QueryRowContext(ctx, query, args...)
-	return row, driver.NewMysqlError(row.Err(), afmt.Sprintf(query, args...))
+	return row, driver.NewMysqlError(row.Err(), query)
 }
 
 func (d *DB) ScanArgs(ctx context.Context, query string, args []any, dest ...any) *ae.Error {
@@ -124,7 +123,7 @@ func (d *DB) ScanArgs(ctx context.Context, query string, args []any, dest ...any
 	if e != nil {
 		return e
 	}
-	return driver.NewMysqlError(row.Scan(dest...), afmt.Sprintf(query, args...))
+	return driver.NewMysqlError(row.Scan(dest...), query)
 }
 func (d *DB) ScanRow(ctx context.Context, query string, dest ...any) *ae.Error {
 	if d.error != nil {
@@ -180,12 +179,12 @@ func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *
 	rows, err := d.DB.QueryContext(ctx, query, args...)
 	if err != nil {
 		if rows != nil {
-			alog.LogOnError(rows.Close())
+			alog.OnError(rows.Close())
 		}
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ae.ErrorNoRowsAvailable
 		}
-		return nil, driver.NewMysqlError(err, afmt.Sprintf(query, args...))
+		return nil, driver.NewMysqlError(err, query)
 	}
 	return rows, nil
 }
