@@ -2,7 +2,7 @@ package mysqli_test
 
 import (
 	"github.com/aarioai/airis-driver/driver/mysqli"
-	"github.com/aarioai/airis/aa/aenum"
+	"github.com/aarioai/airis/aa/atype/aenum"
 	"testing"
 )
 
