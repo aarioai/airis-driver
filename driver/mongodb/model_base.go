@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-var ErrMongodbInsertManyMustInTheSameCollection = ae.NewE("mongodb insert many must in the same collection")
+var ErrMongodbInsertManyMustInTheSameCollection = ae.NewError("mongodb insert many must in the same collection")
 
 func CreateIndexes(ctx context.Context, db *mongo.Database, t index.Entity) *ae.Error {
 	coll := db.Collection(t.Table())
@@ -260,7 +260,7 @@ func InsertOrUpdate(ctx context.Context, db *mongo.Database, t index.Entity, opt
 		}
 	}
 	if len(fi) == 0 {
-		return nil, ae.NewE("missing primary or unique key")
+		return nil, ae.NewError("missing primary or unique key")
 	}
 	filter := bson.D{}
 	if len(fi) == 1 {

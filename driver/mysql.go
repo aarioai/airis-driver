@@ -73,7 +73,7 @@ func NewMysqlDSN(app *aa.App, section string) (string, MysqlOptions, *ae.Error) 
 	ct := f.ConnectTimeout.Seconds()
 	rt := f.ReadTimeout.Seconds()
 	wt := f.WriteTimeout.Seconds()
-	alog.Log("connect mysql: %s@%s %s", f.User, f.Host, f.Schema)
+	alog.Printf("connect mysql: %s@%s %s", f.User, f.Host, f.Schema)
 	return fmt.Sprintf("%s:%s@tcp(%s)/%s?timeout=%.1fs&readTimeout=%.1fs&writeTimeout=%.1fs", f.User, f.Password, f.Host, f.Schema, ct, rt, wt), f, nil
 }
 
@@ -212,12 +212,12 @@ func NewMysqlError(err error, details ...any) *ae.Error {
 	caller := utils.Caller(1)
 
 	errorMapping := map[error]func() *ae.Error{
-		driver.ErrBadConn:        func() *ae.Error { return ae.NewE(caller + sqlBadConnMsg + msg).WithDetail(details...) },
-		driver.ErrSkip:           func() *ae.Error { return ae.NewE(caller + sqlSkipMsg + msg).WithDetail(details...) },
-		driver.ErrRemoveArgument: func() *ae.Error { return ae.NewE(caller + sqlRemoveArgMsg + msg).WithDetail(details...) },
+		driver.ErrBadConn:        func() *ae.Error { return ae.NewError(caller + sqlBadConnMsg + msg).WithDetail(details...) },
+		driver.ErrSkip:           func() *ae.Error { return ae.NewError(caller + sqlSkipMsg + msg).WithDetail(details...) },
+		driver.ErrRemoveArgument: func() *ae.Error { return ae.NewError(caller + sqlRemoveArgMsg + msg).WithDetail(details...) },
 		sql.ErrNoRows:            func() *ae.Error { return ae.ErrorNotFound }, // can't WithDetail, locked
-		sql.ErrConnDone:          func() *ae.Error { return ae.NewE(caller + sqlConnDoneMsg + msg).WithDetail(details...) },
-		sql.ErrTxDone:            func() *ae.Error { return ae.NewE(caller + sqlTxDoneMsg + msg).WithDetail(details...) },
+		sql.ErrConnDone:          func() *ae.Error { return ae.NewError(caller + sqlConnDoneMsg + msg).WithDetail(details...) },
+		sql.ErrTxDone:            func() *ae.Error { return ae.NewError(caller + sqlTxDoneMsg + msg).WithDetail(details...) },
 	}
 
 	for errType, handler := range errorMapping {
@@ -231,5 +231,5 @@ func NewMysqlError(err error, details ...any) *ae.Error {
 		return ae.NewConflict("sql key").WithDetail(details...)
 	}
 
-	return ae.NewE(caller + sqlErrorMsg + msg).WithDetail(details...)
+	return ae.NewError(caller + sqlErrorMsg + msg).WithDetail(details...)
 }

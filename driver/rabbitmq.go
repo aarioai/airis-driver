@@ -129,5 +129,5 @@ func NewRabbitmqError(err error, details ...any) *ae.Error {
 	if err == nil {
 		return nil
 	}
-	return ae.NewError(err, details...)
+	return ae.NewErr(err, details...)
 }

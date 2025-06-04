@@ -277,7 +277,7 @@ func NewMongodbError(err error, details ...any) *ae.Error {
 	caller := utils.Caller(1)
 
 	errorMapping := map[error]func() *ae.Error{
-		mongo.ErrClientDisconnected: func() *ae.Error { return ae.NewE(caller + sqlBadConnMsg + msg).WithDetail(details...) },
+		mongo.ErrClientDisconnected: func() *ae.Error { return ae.NewError(caller + sqlBadConnMsg + msg).WithDetail(details...) },
 		mongo.ErrNoDocuments:        func() *ae.Error { return ae.ErrorNotFound }, // can't WithDetail, locked
 		mongo.ErrNilDocument:        func() *ae.Error { return ae.ErrorNotFound },
 		mongo.ErrFileNotFound:       func() *ae.Error { return ae.ErrorNotFound },
@@ -289,5 +289,5 @@ func NewMongodbError(err error, details ...any) *ae.Error {
 		}
 	}
 
-	return ae.NewError(err).WithDetail(details...)
+	return ae.NewErr(err).WithDetail(details...)
 }

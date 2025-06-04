@@ -291,5 +291,5 @@ func ParseHttpClientConfig(app *aa.App, section string) (HttpClientConfig, error
 }
 
 func NewHttpError(err error) *ae.Error {
-	return ae.NewError(err)
+	return ae.NewErr(err)
 }

@@ -3,7 +3,7 @@ module github.com/aarioai/airis-driver
 go 1.24
 
 require (
-	github.com/aarioai/airis v0.1.210
+	github.com/aarioai/airis v0.1.213
 	github.com/go-sql-driver/mysql v1.9.2
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/rabbitmq/amqp091-go v1.10.0

@@ -224,5 +224,5 @@ func ParseInfluxdbConfig(app *aa.App, section string) (InfluxdbConfig, error) {
 }
 
 func NewInfluxdbError(err error) *ae.Error {
-	return ae.NewError(err)
+	return ae.NewErr(err)
 }
