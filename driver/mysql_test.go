@@ -4,6 +4,7 @@ import (
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis/aa"
 	"github.com/aarioai/airis/aa/aconfig"
+	"github.com/aarioai/airis/aa/acontext"
 	"testing"
 	"time"
 )
@@ -13,7 +14,8 @@ func TestParseIni(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	app := aa.New(c, nil)
+	ctx, cancel := acontext.WithCancel(acontext.Background())
+	app := aa.New(ctx, cancel, c)
 
 	mysqlTestOpt := driver.MysqlOptions{
 		Schema:       "test",

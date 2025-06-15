@@ -11,5 +11,5 @@ func NewError(err EmqxAPIError) *ae.Error {
 	if err.Code == "" {
 		return nil
 	}
-	return ae.NewF("code: %s, reason: %s", err.Code, err.Reason)
+	return ae.NewErrorf("code: %s, reason: %s", err.Code, err.Reason)
 }
