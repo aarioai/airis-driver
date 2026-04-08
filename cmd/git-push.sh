@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# https://github.com/aarioai/opt
+. /opt/aa/lib/aa-posix-lib.sh
+
 CUR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly CUR
 # aarioai/airis
@@ -12,33 +15,8 @@ declare comment
 needCloseVPN=0
 incrTag=1
 
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly NC='\033[0m' # No Color
-
-_log() {
-    local level=$1
-    local color=$2
-    local message=$3
-    echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}${level:+[$level] }${message}${NC}"
-}
-
-Info(){
-    _log "info" "${GREEN}" "$1"
-}
-
-Warn(){
-    _log "warn" "${YELLOW}" "$1" >&2
-}
-
-Panic() {
-    _log "error" "${RED}" "$1" >&2
-    exit 1
-}
-
 usage() {
-    cat << EOF
+  cat << EOF
 Usage: $0 [options] [commit message]
 Options:
     -u          Upgrade go.mod
@@ -46,111 +24,109 @@ Options:
     -i          Skip go mod update
     -h          Show this help message
 EOF
-    exit 1
+  exit 1
 }
 
 while getopts "utih" opt; do
-    case "$opt" in
-        t) incrTag=0 ;;
-        h) usage ;;
-        *) usage ;;
-    esac
+  case "$opt" in
+    t) incrTag=0 ;;
+    h) usage ;;
+    *) usage ;;
+  esac
 done
 shift $((OPTIND-1))
 
 if [ $# -gt 0 ]; then
-    comment="$1"
+  comment="$1"
 fi
 
-
-
 handleUpdateMod(){
-    local latest_update=''
-    local today
-    today="$(date +"%Y-%m-%d")"
-    if [ -s "${MOD_UPDATE_FILE}" ]; then
-        latest_update=$(cat "${MOD_UPDATE_FILE}")
-    fi
+  local latest_update=''
+  local today
+  today="$(date +"%Y-%m-%d")"
+  if [ -s "${MOD_UPDATE_FILE}" ]; then
+      latest_update=$(cat "${MOD_UPDATE_FILE}")
+  fi
 
-    if [[ "$today" = "$latest_update" ]]; then
-        return 0
-    fi
+  if [[ "$today" = "$latest_update" ]]; then
+    return 0
+  fi
 
-    Info "go get -u -v ./..."
-    if ! go get -u -v ./... >/dev/null 2>&1; then
-        Warn "update go modules failed"
-    fi
+  Info "go get -u -v ./..."
+  if ! go get -u -v ./... >/dev/null 2>&1; then
+    Warn "update go modules failed"
+  fi
 
-    [ -f "$MOD_UPDATE_FILE" ] || touch "$MOD_UPDATE_FILE"
-    [ -w "$MOD_UPDATE_FILE" ] || sudo chmod a+rw "$MOD_UPDATE_FILE"
-    Info "save update mod date to $MOD_UPDATE_FILE"
-    printf '%s' "$today" > "$MOD_UPDATE_FILE"
-    cat "$MOD_UPDATE_FILE"
+  [ -f "$MOD_UPDATE_FILE" ] || touch "$MOD_UPDATE_FILE"
+  [ -w "$MOD_UPDATE_FILE" ] || sudo chmod a+rw "$MOD_UPDATE_FILE"
+  Info "save update mod date to $MOD_UPDATE_FILE"
+  printf '%s' "$today" > "$MOD_UPDATE_FILE"
+  cat "$MOD_UPDATE_FILE"
 }
 
 pushAndUpgradeMod() {
-    cd "$ROOT_DIR" || Panic "failed to cd $ROOT_DIR"
+  cd "$ROOT_DIR" || Panic "failed to cd $ROOT_DIR"
 
-    handleUpdateMod
+  handleUpdateMod
 
-    Info "go mod tidy"
-    [ -f "go.mod" ] || go mod init
-    go mod tidy || Panic "failed go mod tidy"
+  Info "go mod tidy"
+  [ -f "go.mod" ] || go mod init
+  go mod tidy || Panic "failed go mod tidy"
 
-    Info "go test ./..."
-    go test ./... || Panic "failed go test ./... failed"
+  Info "go test ./..."
+  go test ./... || Panic "failed go test ./... failed"
 
-    if [ -z "$(git status --porcelain)" ]; then
-        echo "No changes to commit"
-        exit 0
-    fi
+  if [ -z "$(git status --porcelain)" ]; then
+    echo "No changes to commit"
+    exit 0
+  fi
 
-    # check there are changes or not
-    if [ -z "$(git status --porcelain)" ]; then
-        echo "No changes to commit"
-        exit 0
-    fi
-    Info "committing changes..."
-    git add -A . || Panic "failed git add -A ."
-    git commit -m "$comment" || Panic "failed git commit -m $comment"
-    git push origin main || Panic "failed git push origin main"
+  # check there are changes or not
+  if [ -z "$(git status --porcelain)" ]; then
+    echo "No changes to commit"
+    exit 0
+  fi
+  Info "committing changes..."
+  git add -A . || Panic "failed git add -A ."
+  git commit -m "$comment" || Panic "failed git commit -m $comment"
+  git push origin main || Panic "failed git push origin main"
 
-    if [ $incrTag -eq 1 ]; then
-        handle_tags
-    fi
+  if [ $incrTag -eq 1 ]; then
+    handle_tags
+  fi
 }
 
 handle_tags() {
-    Info "managing tags..."
-    git pull origin --tags
-    git tag -l | xargs git tag -d
-    git fetch origin --prune
-    latestTag=$(git describe --tags "$(git rev-list --tags --max-count=1)" 2>/dev/null || echo "")
-    
-    if [ -n "$latestTag" ]; then
-        tag=${latestTag%.*}
-        id=${latestTag##*.}
-        id=$((id+1))
-        newTag="$tag.$id"
-        
-        Info "removing old tag: $latestTag"
-        git tag -d "$latestTag"
-        git push origin --delete tag "$latestTag"
-        
-        git tag "$newTag"
-        git push origin --tags
-        Info "new tag created: $newTag"
-    fi
+  Info "managing tags..."
+  git pull origin --tags
+  git tag -l | xargs git tag -d
+  git fetch origin --prune
+  latestTag=$(git describe --tags "$(git rev-list --tags --max-count=1)" 2>/dev/null || echo "")
+
+  if [ -n "$latestTag" ]; then
+    tag=${latestTag%.*}
+    id=${latestTag##*.}
+    id=$((id+1))
+    newTag="$tag.$id"
+
+    Info "removing old tag: $latestTag"
+    git tag -d "$latestTag"
+    git push origin --delete tag "$latestTag"
+
+    git tag "$newTag"
+    git push origin --tags
+    Info "new tag created: $newTag"
+  fi
 }
 
 
 unsetVPN() {
   if [[ $1 -eq 1 ]]; then
-      echo "unset VPN"
-      export http_proxy=""
-      export https_proxy=""
-      unset http_proxy
-      unset https_poxy
+    echo "unset VPN"
+    export http_proxy=""
+    export https_proxy=""
+    unset http_proxy
+    unset https_poxy
   fi
 }
 
@@ -163,14 +139,12 @@ setVPN() {
   export http_proxy=http://127.0.0.1:8118
   export https_proxy=http://127.0.0.1:8118
 
-  local http_code
-  http_code=$(curl --max-time 3 -s -w '%{http_code}\n' -o /dev/null google.com || printf '')
-  if [[ $http_code =~ ^[23][0-9]{2}$ ]]; then
+  if HttpOK 'google.com'; then
     needCloseVPN=1
-    echo "start VPN (HTTP $http_code)"
+    Info "start VPN"
   else
     unsetVPN 1
-    echo "check VPN failed (HTTP $http_code)"
+    Info "check VPN failed"
   fi
 }
 
