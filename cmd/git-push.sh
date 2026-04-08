@@ -24,10 +24,6 @@ _log() {
     echo -e "$(date '+%Y-%m-%d %H:%M:%S') ${color}${level:+[$level] }${message}${NC}"
 }
 
-Log() {
-    _log "" "" "$1"
-}
-
 Info(){
     _log "info" "${GREEN}" "$1"
 }
