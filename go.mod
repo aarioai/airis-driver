@@ -3,14 +3,14 @@ module github.com/aarioai/airis-driver
 go 1.24
 
 require (
-	github.com/aarioai/airis v0.1.258
+	github.com/aarioai/airis v0.1.284
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.10.0
 	github.com/wagslane/go-rabbitmq v0.15.0
 	go.mongodb.org/mongo-driver/v2 v2.2.2
-	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476
+	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b
 )
 
 require (
@@ -19,8 +19,8 @@ require (
 	github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53 // indirect
 	github.com/CloudyKit/jet/v6 v6.3.1 // indirect
 	github.com/Joker/jade v1.1.3 // indirect
-	github.com/Shopify/goreferrer v0.0.0-20250513162709-b78e2829e40b // indirect
-	github.com/andybalholm/brotli v1.1.1 // indirect
+	github.com/Shopify/goreferrer v0.0.0-20250617153402-88c1d9a79b05 // indirect
+	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect

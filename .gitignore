@@ -1,9 +1,10 @@
+# General Git Ignore File
 # https://github.com/aarioai/rules/blob/main/config/.gitignore
 # https://www.atlassian.com/git/tutorials/saving-changes/gitignore
-# 2025-04-22.2
+# 2026-04-07
 
-# .aa-env, .aa-update
-.aa-*
+# ._env, ._update
+._*
 
 # Compiled Java class files
 *.class
@@ -15,8 +16,7 @@
 .DS_Store
 
 # jetbrain IDE config directory
-# keep it
-#.idea
+.idea
 
 # python venv
 .venv
@@ -39,5 +39,11 @@ nohup.out
 # Compiled Python bytecode
 *.py[cod]
 
+# js package
+package-lock.json
+
 # Windows auto generated file
 Thumbs.db
+
+# js yarn
+yarn.lock
