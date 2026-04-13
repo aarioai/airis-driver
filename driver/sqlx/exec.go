@@ -1,4 +1,4 @@
-package sql
+package sqlx
 
 import (
 	"context"
@@ -25,7 +25,7 @@ func NewDriver(schema string, db *sql.DB, e *ae.Error) *DB {
 	}
 }
 
-// 批处理 prepare 性能会更好，但需要支持 sql；非批处理，不要使用 prepare，会造成多余开销
+// 批处理 prepare 性能会更好，但需要支持 sqlx；非批处理，不要使用 prepare，会造成多余开销
 // 不要忘记 stmt.Close() 释放连接池资源
 // Prepared statements take up server resources and should be closed after use.
 func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {
@@ -95,13 +95,13 @@ func (d *DB) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 		stmt.QueryRowContext(ctx, i).&Scan()
 	}
 */
-//func (d *DB) BatchQueryRow(ctx context.Context, query string, margs ...[]any) ([]*sql.Row, *ae.Error) {
+//func (d *DB) BatchQueryRow(ctx context.Context, query string, margs ...[]any) ([]*sqlx.Row, *ae.Error) {
 //	stmt, e := d.Prepare(ctx, query)
 //	if e != nil {
 //		return nil, e
 //	}
 //	defer stmt.Close()
-//	rows := make([]*sql.Row, len(margs))
+//	rows := make([]*sqlx.Row, len(margs))
 //	for i, args := range margs {
 //		rows[i] = stmt.QueryRowContext(ctx, args...)
 //	}
@@ -172,7 +172,7 @@ func (d *DB) ScanAny(ctx context.Context, query string, id any, dest ...any) *ae
 
 // Query returns a nil result when no rows are found.
 // QueryRow returns ae.ErrorNotFound if no rows match the query.
-// do not forget to close *sql.Rows
+// do not forget to close *sqlx.Rows
 func (d *DB) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *ae.Error) {
 	if d.error != nil {
 		return nil, d.error

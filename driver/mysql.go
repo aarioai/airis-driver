@@ -5,6 +5,10 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"regexp"
+	"sync"
+	"time"
+
 	"github.com/aarioai/airis/aa"
 	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/aa/alog"
@@ -12,18 +16,15 @@ import (
 	"github.com/aarioai/airis/pkg/types"
 	"github.com/aarioai/airis/pkg/utils"
 	_ "github.com/go-sql-driver/mysql" // 需要引入
-	"regexp"
-	"sync"
-	"time"
 )
 
 const (
-	sqlBadConnMsg   = "sql bad conn: "
-	sqlSkipMsg      = "sql skip: "
-	sqlRemoveArgMsg = "sql remove argument: "
-	sqlConnDoneMsg  = "sql conn done: "
-	sqlTxDoneMsg    = "sql tx done: "
-	sqlErrorMsg     = "sql error: "
+	sqlBadConnMsg   = "sqlx bad conn: "
+	sqlSkipMsg      = "sqlx skip: "
+	sqlRemoveArgMsg = "sqlx remove argument: "
+	sqlConnDoneMsg  = "sqlx conn done: "
+	sqlTxDoneMsg    = "sqlx tx done: "
+	sqlErrorMsg     = "sqlx error: "
 )
 
 var (
@@ -84,11 +85,11 @@ func NewMysql(app *aa.App, section string) (string, *sql.DB, *ae.Error) {
 	if e != nil {
 		return "", nil, e
 	}
-	// sql.Open并不会立即建立一个数据库的网络连接, 也不会对数据库链接参数的合法性做检验, 它仅仅是初始化一个sql.DB对象. 当真正进行第一次数据库查询操作时, 此时才会真正建立网络连接;
-	// sql.Open返回的sql.DB对象是协程并发安全的.
-	// sql.DB表示操作数据库的抽象接口的对象，但不是所谓的数据库连接对象，sql.DB对象只有当需要使用时才会创建连接，如果想立即验证连接，需要用Ping()方法;
+	// sqlx.Open并不会立即建立一个数据库的网络连接, 也不会对数据库链接参数的合法性做检验, 它仅仅是初始化一个sql.DB对象. 当真正进行第一次数据库查询操作时, 此时才会真正建立网络连接;
+	// sqlx.Open返回的sql.DB对象是协程并发安全的.
+	// sqlx.DB表示操作数据库的抽象接口的对象，但不是所谓的数据库连接对象，sqlx.DB对象只有当需要使用时才会创建连接，如果想立即验证连接，需要用Ping()方法;
 	// 每次db.Query操作后, 都建议调用rows.Close(). 因为 db.Query() 会从数据库连接池中获取一个连接, 这个底层连接在结果集(rows)未关闭前会被标记为处于繁忙状态。当遍历读到最后一条记录时，会发生一个内部EOF错误，自动调用rows.Close(),但如果提前退出循环，rows不会关闭，连接不会回到连接池中，连接也不会关闭, 则此连接会一直被占用. 因此通常我们使用 defer rows.Close() 来确保数据库连接可以正确放回到连接池中; 不过阅读源码发现rows.Close()操作是幂等操作，即一个幂等操作的特点是其任意多次执行所产生的影响均与一次执行的影响相同, 所以即便对已关闭的rows再执行close()也没关系.
-	// 需要import 	_ "github.com/go-sql-driver/mysql"
+	// 需要import 	_ "github.com/go-sqlx-driver/mysql"
 	conn, err := sql.Open("mysql", dsn)
 	if err != nil {
 		return "", conn, NewMysqlError(err, fmt.Sprintf("open mysql: %s", dsn))
@@ -228,7 +229,7 @@ func NewMysqlError(err error, details ...any) *ae.Error {
 
 	// 处理重复键错误
 	if matches := duplicateKeyPattern.FindStringSubmatch(msg); len(matches) == 3 {
-		return ae.NewConflict("sql key").WithDetail(details...)
+		return ae.NewConflict("sqlx key").WithDetail(details...)
 	}
 
 	return ae.NewError(caller + sqlErrorMsg + msg).WithDetail(details...)

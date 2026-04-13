@@ -1,9 +1,9 @@
-package sql_test
+package sqlx_test
 
 import (
 	"testing"
 
-	"github.com/aarioai/airis-driver/driver/sql"
+	"github.com/aarioai/airis-driver/driver/sqlx"
 )
 
 func TestInsertMany(t *testing.T) {
@@ -13,7 +13,7 @@ func TestInsertMany(t *testing.T) {
 	}
 
 	for n, want := range wants {
-		qs := sql.InsertMany("user", "(nickname, avatar, created_at, updated_at)", "(?, ?, now(), now())", n)
+		qs := sqlx.InsertMany("user", "(nickname, avatar, created_at, updated_at)", "(?, ?, now(), now())", n)
 		if qs != want {
 			t.Errorf("num=%d, qs = %q, want %q", n, qs, want)
 		}

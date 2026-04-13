@@ -1,4 +1,4 @@
-package sql
+package sqlx
 
 import (
 	"context"
@@ -107,12 +107,12 @@ func (t *Tx) Update(ctx context.Context, query string, args ...any) (int64, *ae.
 		stmt.QueryRowContext(ctx, i).&Scan()
 	}
 */
-//func (t *Tx) BatchQueryRow(ctx context.Context, query string, margs ...[]any) (*sql.Stmt, []*sql.Row, *ae.Error) {
+//func (t *Tx) BatchQueryRow(ctx context.Context, query string, margs ...[]any) (*sqlx.Stmt, []*sqlx.Row, *ae.Error) {
 //	stmt, e := t.Prepare(ctx, query)
 //	if e != nil {
 //		return stmt, nil, e
 //	}
-//	rows := make([]*sql.Row, len(margs))
+//	rows := make([]*sqlx.Row, len(margs))
 //	for i, args := range margs {
 //		rows[i] = stmt.QueryRowContext(ctx, args...)
 //	}
@@ -166,7 +166,7 @@ func (t *Tx) ScanAny(ctx context.Context, query string, id any, dest ...any) *ae
 
 // Query returns a nil result when no rows are found.
 // QueryRow returns ae.ErrorNotFound if no rows match the query.
-// do not forget to close *sql.Rows
+// do not forget to close *sqlx.Rows
 func (t *Tx) Query(ctx context.Context, query string, args ...any) (*sql.Rows, *ae.Error) {
 	rows, err := t.Tx.QueryContext(ctx, query, args...)
 	if err != nil {

@@ -1,14 +1,14 @@
-package sql_test
+package sqlx_test
 
 import (
 	"testing"
 
-	"github.com/aarioai/airis-driver/driver/sql"
+	"github.com/aarioai/airis-driver/driver/sqlx"
 	"github.com/aarioai/airis/aa/atype/aenum"
 )
 
 func TestCond(t *testing.T) {
-	var cond = &sql.Cond{}
+	var cond = &sqlx.Cond{}
 	cond.And("t.id", "100")
 	cond.Write("AND", aenum.StsInvalid("t.status"))
 	cond.Try("t.ranking_woman DESC, t.vuid", 0, 20)
