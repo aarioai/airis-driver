@@ -19,12 +19,12 @@ import (
 )
 
 const (
-	sqlBadConnMsg   = "sqlx bad conn: "
-	sqlSkipMsg      = "sqlx skip: "
-	sqlRemoveArgMsg = "sqlx remove argument: "
-	sqlConnDoneMsg  = "sqlx conn done: "
-	sqlTxDoneMsg    = "sqlx tx done: "
-	sqlErrorMsg     = "sqlx error: "
+	sqlBadConnMsg   = "sql bad conn: "
+	sqlSkipMsg      = "sql skip: "
+	sqlRemoveArgMsg = "sql remove argument: "
+	sqlConnDoneMsg  = "sql conn done: "
+	sqlTxDoneMsg    = "sql tx done: "
+	sqlErrorMsg     = "sql error: "
 )
 
 var (
@@ -229,7 +229,7 @@ func NewMysqlError(err error, details ...any) *ae.Error {
 
 	// 处理重复键错误
 	if matches := duplicateKeyPattern.FindStringSubmatch(msg); len(matches) == 3 {
-		return ae.NewConflict("sqlx key").WithDetail(details...)
+		return ae.NewConflict("sql key").WithDetail(details...)
 	}
 
 	return ae.NewError(caller + sqlErrorMsg + msg).WithDetail(details...)
