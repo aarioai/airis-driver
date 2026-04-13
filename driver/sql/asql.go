@@ -1,4 +1,4 @@
-package mysqli
+package sql
 
 import (
 	"fmt"

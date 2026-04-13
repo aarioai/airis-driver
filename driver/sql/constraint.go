@@ -1,9 +1,10 @@
-package mysqli
+package sql
 
 import (
-	"github.com/aarioai/airis/aa/atype"
 	"regexp"
 	"strings"
+
+	"github.com/aarioai/airis/aa/atype"
 )
 
 func byAlias(fields ...string) bool {

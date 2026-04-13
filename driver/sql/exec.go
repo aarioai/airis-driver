@@ -1,10 +1,11 @@
-package mysqli
+package sql
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/aa/alog"
@@ -24,7 +25,7 @@ func NewDriver(schema string, db *sql.DB, e *ae.Error) *DB {
 	}
 }
 
-// 批处理 prepare 性能会更好，但需要支持 mysqli；非批处理，不要使用 prepare，会造成多余开销
+// 批处理 prepare 性能会更好，但需要支持 sql；非批处理，不要使用 prepare，会造成多余开销
 // 不要忘记 stmt.Close() 释放连接池资源
 // Prepared statements take up server resources and should be closed after use.
 func (d *DB) Prepare(ctx context.Context, query string) (*sql.Stmt, *ae.Error) {

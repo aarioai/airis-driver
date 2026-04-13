@@ -1,13 +1,14 @@
-package mysqli_test
+package sql_test
 
 import (
-	"github.com/aarioai/airis-driver/driver/mysqli"
-	"github.com/aarioai/airis/aa/atype/aenum"
 	"testing"
+
+	"github.com/aarioai/airis-driver/driver/sql"
+	"github.com/aarioai/airis/aa/atype/aenum"
 )
 
 func TestCond(t *testing.T) {
-	var cond = &mysqli.Cond{}
+	var cond = &sql.Cond{}
 	cond.And("t.id", "100")
 	cond.Write("AND", aenum.StsInvalid("t.status"))
 	cond.Try("t.ranking_woman DESC, t.vuid", 0, 20)

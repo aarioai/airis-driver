@@ -1,9 +1,18 @@
-package mysqli
+package sql
 
 import (
-	"github.com/aarioai/airis/pkg/types"
+	"fmt"
 	"strings"
+
+	"github.com/aarioai/airis/pkg/types"
 )
+
+// InsertMany insert many rows with prepare statement
+// Example. InsertMany("user", "(nickname, avatar, created_at, updated_at)", "(?, ?, now(), now())", len(ts))
+func InsertMany(table, columns, valuePattern string, num int) string {
+	qs := fmt.Sprintf(`INSERT INTO %s %s VALUES %s`, table, columns, strings.Repeat(valuePattern+",", num))
+	return qs[:len(qs)-1]
+}
 
 func In(field string, ids map[uint64]struct{}) string {
 	if len(ids) == 0 {

@@ -1,11 +1,12 @@
-package mysqli
+package sql
 
 import (
 	"context"
 	"fmt"
+	"strings"
+
 	"github.com/aarioai/airis-driver/driver/index"
 	"github.com/aarioai/airis/aa/ae"
-	"strings"
 )
 
 type ORMS struct {

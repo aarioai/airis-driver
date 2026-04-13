@@ -1,8 +1,9 @@
-package mysqli
+package sql
 
 import (
-	"github.com/aarioai/airis/pkg/types"
 	"strings"
+
+	"github.com/aarioai/airis/pkg/types"
 )
 
 const (

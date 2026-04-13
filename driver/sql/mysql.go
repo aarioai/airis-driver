@@ -1,13 +1,14 @@
-package mysqli
+package sql
 
 import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strings"
+
 	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
-	"strings"
 )
 
 const InArgs = "(...)" // InArgs 占位符

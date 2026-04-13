@@ -1,9 +1,10 @@
-package mysqli
+package sql
 
 import (
+	"strings"
+
 	"github.com/aarioai/airis/aa/atype"
 	"github.com/aarioai/airis/pkg/types"
-	"strings"
 )
 
 type Cond struct {

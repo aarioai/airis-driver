@@ -1,14 +1,15 @@
-package mysqli
+package sql
 
 import (
 	"context"
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
+
 	"github.com/aarioai/airis-driver/driver"
 	"github.com/aarioai/airis/aa/ae"
 	"github.com/aarioai/airis/aa/alog"
-	"log"
 )
 
 type txResult uint8

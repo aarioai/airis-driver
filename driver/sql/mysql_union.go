@@ -1,9 +1,10 @@
-package mysqli
+package sql
 
 import (
 	"fmt"
-	"github.com/aarioai/airis/pkg/types"
 	"strings"
+
+	"github.com/aarioai/airis/pkg/types"
 )
 
 func UnionAllQs(format string, ptbs []string, xargs func(ptb string) []any) string {
