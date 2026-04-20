@@ -141,7 +141,7 @@ func CloseMysqlPool() {
 	})
 }
 
-// func keepalive(app *aa.App) {
+// func keepalive(bo *aa.App) {
 // 	tick := time.NewTicker(60 * time.Second)
 // 	var err error
 // 	for {
@@ -149,7 +149,7 @@ func CloseMysqlPool() {
 // 		case <-tick.C:
 // 			if err = mysqlPool1.Ping(); err != nil {
 // 				mysqlPool1.Close()
-// 				mysqlPool1, err = connectMysql1(app)
+// 				mysqlPool1, err = connectMysql1(bo)
 // 			}
 // 		}
 // 		runtime.Gosched()
