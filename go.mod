@@ -3,7 +3,8 @@ module github.com/aarioai/airis-driver
 go 1.24
 
 require (
-	github.com/aarioai/airis v0.1.292
+	// airis 需要改成最新版本
+	github.com/aarioai/airis v0.1.295
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/rabbitmq/amqp091-go v1.10.0
