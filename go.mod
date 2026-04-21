@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	// airis 需要改成最新版本 https://github.com/aarioai/airis/tags
-	github.com/aarioai/airis v0.1.299
+	github.com/aarioai/airis v0.1.300
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/influxdata/influxdb-client-go/v2 v2.14.0
 	github.com/rabbitmq/amqp091-go v1.10.0
