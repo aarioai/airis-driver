@@ -13,7 +13,7 @@ import (
 
 func CheckMongodbHealth(section string) func(app *aa.App, errChan chan<- error) {
 	return func(app *aa.App, errChan chan<- error) {
-		alog.Console("check health -> mongodb (" + section + ")")
+		alog.Console("check health -> mongodb [" + section + "]")
 		ctx := context.Background()
 		client, _, e := NewMongodb(app, section)
 		if e != nil {
@@ -26,14 +26,14 @@ func CheckMongodbHealth(section string) func(app *aa.App, errChan chan<- error) 
 			errChan <- fmt.Errorf("mongodb (%s) ping error: %s", section, err.Error())
 			return
 		}
-		alog.Console("mongodb (" + section + ") is healthy")
+		alog.Console("mongodb [" + section + "] is healthy")
 		errChan <- nil
 	}
 }
 
 func CheckMySQLHealth(section string) func(app *aa.App, errChan chan<- error) {
 	return func(app *aa.App, errChan chan<- error) {
-		alog.Console("check health -> mysql (" + section + ")")
+		alog.Console("check health -> mysql [" + section + "]")
 		_, db, e := NewMysql(app, section)
 		if e != nil {
 			errChan <- fmt.Errorf("mysql (%s) connect error: %s", section, e.Msg)
@@ -45,14 +45,14 @@ func CheckMySQLHealth(section string) func(app *aa.App, errChan chan<- error) {
 			errChan <- fmt.Errorf("mysql (%s) ping error: %s", section, err.Error())
 			return
 		}
-		alog.Console("mysql (" + section + ") is healthy")
+		alog.Console("mysql [" + section + "] is healthy")
 		errChan <- nil
 	}
 }
 
 func CheckRabbitmqHealth(section string, tlsConfig *tls.Config, sasl []amqp091.Authentication, opts []func(*rabbitmq.ConnectionOptions)) func(app *aa.App, errChan chan<- error) {
 	return func(app *aa.App, errChan chan<- error) {
-		alog.Console("check health -> rabbitmq (" + section + ")")
+		alog.Console("check health -> rabbitmq [" + section + "]")
 		conn, e := NewRabbitmqPool(app, section, tlsConfig, sasl, opts)
 		if e != nil {
 			errChan <- fmt.Errorf("rabbitmq (%s) connect error: %s", section, e.Msg)
@@ -69,14 +69,14 @@ func CheckRabbitmqHealth(section string, tlsConfig *tls.Config, sasl []amqp091.A
 			return
 		}
 		defer consumer.Close()
-		alog.Console("rabbitmq (" + section + ") is healthy")
+		alog.Console("rabbitmq [" + section + "] is healthy")
 		errChan <- nil
 	}
 }
 
 func CheckRedisHealth(section string) func(app *aa.App, errChan chan<- error) {
 	return func(app *aa.App, errChan chan<- error) {
-		alog.Console("check health -> redis (" + section + ")")
+		alog.Console("check health -> redis [" + section + "]")
 		client, e := NewRedis(app, section)
 		if e != nil {
 			errChan <- fmt.Errorf("redis (%s) connect error: %s", section, e.Msg)
@@ -88,7 +88,7 @@ func CheckRedisHealth(section string) func(app *aa.App, errChan chan<- error) {
 			errChan <- fmt.Errorf("redis (%s) ping error: %s", section, err.Error())
 			return
 		}
-		alog.Console("redis (" + section + ") is healthy")
+		alog.Console("redis [" + section + "] is healthy")
 		errChan <- nil
 	}
 }
